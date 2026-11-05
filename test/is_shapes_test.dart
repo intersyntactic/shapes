@@ -11,6 +11,12 @@ final class _Reaction {}
 
 final class _Message {}
 
+/// A value as a module declares one.
+final class _Level extends Value {
+  const _Level(this.level);
+  final int level;
+}
+
 PartyId _peter() => PartyId.parse('U024BE7LH')!;
 
 void main() {
@@ -95,6 +101,11 @@ void main() {
     expect(withdrawal, isNot(isA<Withdraw<_Message>>()));
     expect(withdrawal.target, TurnId.parse(_hex));
     expect(withdrawal.by, _peter());
+  });
+
+  test('a module declares its own value by extending Value', () {
+    const Value value = _Level(2);
+    expect(value, isA<_Level>().having((v) => v.level, 'level', 2));
   });
 
   test('identity is the one Identity', () {

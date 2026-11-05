@@ -13,7 +13,7 @@ declared once, here, for every module that needs them.
 ```dart
 import 'package:is_shapes/is_shapes.dart';
 
-/// A message is about when it was sent; its text may be edited.
+/// A message is about when it was sent; its text is its value, and may be edited.
 final class Message {
   const Message({required this.sentAt, required this.text});
   @identity
@@ -26,12 +26,18 @@ final takeBack = Withdraw<Message>(target: sent, by: author);
 
 ## What is here
 
-- `@identity`: marks a field as what the node is about. Every other field is a
-  verdict, which a later pass may change. A shape with no field marked has
+- `@identity`: marks a field as what the node is about. Every other field is
+  its value, what it currently says, which a later pass may change. A shape with no field marked has
   every field as identity, so revision is opt-in
   ([#1068](https://github.com/enspyrco/intersyntactic/issues/1068)). The
   analyzer reads it from source by its type, `Identity`, without running
   anything.
+- `Value`: the other half of a shape. A shape that can be corrected gathers
+  its value into one class extending `Value`, under whatever name fits it
+  (Hart's `RungVerdict extends Value`), and `Correction<V extends Value>` in
+  `is_review_shapes` proposes a new one. It is `abstract base`: another
+  library can extend it but not implement it, and a record or an extension
+  type can't be one. Declare values `final`.
 - `TurnId`: one exact node: the sha256 of its parent's id and its own bytes,
   like a git commit.
 - `SemanticAnchor`: the same node in any pass, hashed from its shape and

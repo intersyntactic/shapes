@@ -9,6 +9,8 @@
 /// declared once, here, for every module that needs them.
 ///
 /// - [identity]: marks the fields a node is about.
+/// - [Value]: the other half, what a node currently says, when a shape gathers
+///   it into one type that can be revised whole.
 /// - [TurnId], [SemanticAnchor], and the [Target] made of the two: a node,
 ///   exactly and in any pass.
 /// - [PartyId]: who wrote a node.
@@ -38,7 +40,7 @@ import 'package:is_content_id/is_content_id.dart';
 final _printableAscii = RegExp(r'^[\x21-\x7e]+$');
 
 /// Marks a field of a shape as identity: what the node is about. Every other
-/// field is a verdict: what the node concludes.
+/// field is its value: what it currently says.
 ///
 /// ```dart
 /// final class SlackMessage {
@@ -50,7 +52,7 @@ final _printableAscii = RegExp(r'^[\x21-\x7e]+$');
 /// ```
 ///
 /// A shape with no field marked has every field as identity. So revision is
-/// opt-in: a field is a verdict, which a later pass may change, only when its
+/// opt-in: a field is value, which a later pass may change, only when its
 /// shape says so (https://github.com/enspyrco/intersyntactic/issues/1068).
 ///
 /// Nothing runs it. The analyzer reads it from a shape file's source, by its
@@ -62,6 +64,43 @@ const identity = Identity._();
 /// only one, and a reader looking for the annotation looks for this type.
 final class Identity {
   const Identity._();
+}
+
+/// What a node currently says, gathered into one type: the fields that are
+/// not [identity], in a shape whose value can be revised whole.
+///
+/// A shape that can be corrected declares its own value as a class extending
+/// this one, under whatever name fits it, and holds it in one field:
+///
+/// ```dart
+/// final class RungVerdict extends Value {
+///   const RungVerdict(this.level, this.rationale);
+///   final RungLevel level;
+///   final String rationale;
+/// }
+///
+/// final class Rung {
+///   const Rung({required this.failureMode, required this.verdict});
+///   @identity
+///   final String failureMode;
+///   final RungVerdict verdict;
+/// }
+/// ```
+///
+/// A correction is generic over the value it proposes, bounded by this class
+/// (`Correction<V extends Value>`, in `is_review_shapes`). Classes match by
+/// name, so the analyzer refuses a correction that proposes one shape's value
+/// to another, even when their fields are the same. A record or an extension
+/// type can't extend a class, so neither can be a value; and a class survives
+/// at run time, so a delivered value can be checked with `is`. Declare a
+/// value `final`: one with subclasses would let a correction proposing a
+/// subclass bind where its parent is accepted.
+///
+/// It is `base`, so another library can extend it but never implement it. It
+/// is not `sealed`, since only its own library could extend a sealed class,
+/// and every module declares its own values.
+abstract base class Value {
+  const Value();
 }
 
 /// Takes back a [T]: the node at [target], which [by] wrote.
@@ -135,9 +174,8 @@ final class TurnId extends Sha256Name {
 }
 
 /// The same node in any pass: hashed from its shape and its identity fields,
-/// never its parent or its verdicts. So a reference made on one pass still
-/// finds its node in the next, where the verdict has changed and the identity
-/// has not.
+/// never its parent or its value. So a reference made on one pass still finds
+/// its node in the next, where the value has changed and the identity has not.
 final class SemanticAnchor extends Sha256Name {
   SemanticAnchor._(super.digest);
 
