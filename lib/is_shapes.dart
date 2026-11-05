@@ -18,16 +18,23 @@
 /// these in `is_review_shapes`, for the modules where a person judges
 /// something.
 ///
-/// An id is a class with a library-private constructor, made only by `parse`,
-/// which returns null for a malformed one. So code holding one never asks
-/// whether it is well formed. Classes, not extension types, since a `String`
-/// can be cast to an extension type and skip every check.
+/// An id is a class with a library-private constructor, made by `of`, which
+/// hashes, or by `parse`, which returns null for a malformed one. So code
+/// holding one never asks whether it is well formed. Classes, not extension
+/// types, since a `String` can be cast to an extension type and skip every
+/// check. The two hashes are `Sha256Name`s from `is_content_id`, made with its
+/// `sha256`, so every name in intersyntactic is made by one sha256 that can be
+/// checked in one place.
 ///
-/// It imports nothing, so a shape file may import it under import admission's
-/// pure list (https://github.com/enspyrco/intersyntactic/issues/1046).
+/// It imports only `is_content_id`, so a shape file may import it under import
+/// admission's pure list once both are on it
+/// (https://github.com/enspyrco/intersyntactic/issues/1046).
 library;
 
-final _sha256Hex = RegExp(r'^[0-9a-f]{64}$');
+import 'dart:typed_data';
+
+import 'package:is_content_id/is_content_id.dart';
+
 final _printableAscii = RegExp(r'^[\x21-\x7e]+$');
 
 /// Marks a field of a shape as identity: what the node is about. Every other
@@ -106,60 +113,46 @@ final class Target {
   int get hashCode => Object.hash(exact, anchor);
 }
 
-/// A sha256 used as a name, written as lower-case hex. Each kind of name
-/// extends it, and two kinds with the same hex are never equal, so one can't
-/// be passed or compared as the other.
-sealed class _Sha256Hex {
-  const _Sha256Hex(this.hex);
-
-  /// The sha256 in lower-case hex: 64 characters.
-  final String hex;
-
-  /// Equal only to the same kind of name with the same hex.
-  @override
-  bool operator ==(Object other) =>
-      other is _Sha256Hex &&
-      other.runtimeType == runtimeType &&
-      other.hex == hex;
-
-  @override
-  int get hashCode => Object.hash(runtimeType, hex);
-
-  @override
-  String toString() => hex;
-}
-
-/// One exact node.
+/// One exact node: the sha256 of its parent's id and its own bytes, like a
+/// git commit, so it names the node's whole path. Two nodes with the same
+/// fields in different places have different ids.
 ///
-/// A node's id is a hash of its parent's id and its own bytes, like a git
-/// commit, so it names the node's whole path. Two nodes with the same fields
-/// in different places have different ids.
-///
-/// Only [parse] makes one here. What mints a node's id is the line, which
-/// hashes the node; this package never sees a node's bytes.
-final class TurnId extends _Sha256Hex {
-  const TurnId._(super.hex);
+/// It is a different kind of name from a [SemanticAnchor] or an `ObjectId`,
+/// so the same bytes as one of those are never equal to it.
+final class TurnId extends Sha256Name {
+  TurnId._(super.digest);
+
+  /// The id of the node whose bytes, as the line stores them, are [node].
+  /// Which bytes those are is the line's to say: it is what mints a node's id.
+  factory TurnId.of(Uint8List node) => TurnId._(sha256(node));
 
   /// [s] as a turn id, read back from text; null unless it is a sha256 in
   /// lower-case hex.
-  static TurnId? parse(String s) => _sha256Hex.hasMatch(s) ? TurnId._(s) : null;
+  static TurnId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
+    final d? => TurnId._(d),
+    null => null,
+  };
 }
 
 /// The same node in any pass: hashed from its shape and its identity fields,
 /// never its parent or its verdicts. So a reference made on one pass still
 /// finds its node in the next, where the verdict has changed and the identity
 /// has not.
-///
-/// How the hash is taken is the shape language's to say
-/// (https://github.com/enspyrco/intersyntactic/issues/1068). This type only
-/// holds it.
-final class SemanticAnchor extends _Sha256Hex {
-  const SemanticAnchor._(super.hex);
+final class SemanticAnchor extends Sha256Name {
+  SemanticAnchor._(super.digest);
+
+  /// The anchor of a node whose shape and identity fields, encoded, are
+  /// [identity]. How they are encoded is the shape language's to say
+  /// (https://github.com/enspyrco/intersyntactic/issues/1068).
+  factory SemanticAnchor.of(Uint8List identity) =>
+      SemanticAnchor._(sha256(identity));
 
   /// [s] as an anchor, read back from text; null unless it is a sha256 in
   /// lower-case hex.
-  static SemanticAnchor? parse(String s) =>
-      _sha256Hex.hasMatch(s) ? SemanticAnchor._(s) : null;
+  static SemanticAnchor? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
+    final d? => SemanticAnchor._(d),
+    null => null,
+  };
 }
 
 /// Who wrote a node: a person, or an agent.

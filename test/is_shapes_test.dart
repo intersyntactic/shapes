@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:is_content_id/is_content_id.dart';
 import 'package:is_shapes/is_shapes.dart';
 import 'package:test/test.dart';
 
@@ -38,8 +41,16 @@ void main() {
       expect(TurnId.parse(_hex).hashCode, TurnId.parse(_hex).hashCode);
     });
 
-    test('a turn id is never equal to an anchor with the same hex', () {
+    test('of hashes with is_content_id\'s sha256', () {
+      // _hex is the sha256 of no bytes.
+      expect(TurnId.of(Uint8List(0)).hex, _hex);
+      expect(SemanticAnchor.of(Uint8List(0)).hex, _hex);
+      expect(TurnId.of(Uint8List(0)), TurnId.parse(_hex));
+    });
+
+    test('a turn id is never equal to another kind with the same bytes', () {
       expect(TurnId.parse(_hex), isNot(SemanticAnchor.parse(_hex)));
+      expect(TurnId.of(Uint8List(0)), isNot(ObjectId.of(Uint8List(0))));
     });
 
     test('a string cannot be cast to one', () {

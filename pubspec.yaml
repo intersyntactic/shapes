@@ -9,6 +9,13 @@ repository: https://github.com/intersyntactic/shapes
 environment:
   sdk: ^3.13.0
 
+dependencies:
+  # A git dependency until is_content_id is published; then ^0.1.0.
+  is_content_id:
+    git:
+      url: git@github.com:intersyntactic/content_id.git
+      ref: first-release
+
 dev_dependencies:
   lints: ^6.1.0
   test: ^1.33.0

@@ -32,7 +32,8 @@ final takeBack = Withdraw<Message>(target: sent, by: author);
   ([#1068](https://github.com/enspyrco/intersyntactic/issues/1068)). The
   analyzer reads it from source by its type, `Identity`, without running
   anything.
-- `TurnId`: one exact node. Its id hashes its parent's, like a git commit.
+- `TurnId`: one exact node: the sha256 of its parent's id and its own bytes,
+  like a git commit.
 - `SemanticAnchor`: the same node in any pass, hashed from its shape and
   identity fields only.
 - `Target`: the two together, so a reference survives a new pass and a reader
@@ -44,12 +45,15 @@ final takeBack = Withdraw<Message>(target: sent, by: author);
   on it; no field holds a `T`, so the reader that fetches the target checks
   it is one.
 
-Every id is a class with a library-private constructor, made only by `parse`,
-which returns null for a malformed one
+Every id is a class with a library-private constructor, made by `of`, which
+hashes, or by `parse`, which returns null for a malformed one
 ([enspyrco/intersyntactic#1082](https://github.com/enspyrco/intersyntactic/pull/1082)).
 Code that holds one never asks whether it is well formed. They are classes, not
 extension types, because a `String` can be cast to an extension type and skip
-the check.
+the check. `TurnId` and `SemanticAnchor` are `Sha256Name`s from
+[`is_content_id`](https://github.com/intersyntactic/content_id), made with its
+`sha256`, so every name in intersyntactic is made by one sha256 that can be
+checked in one place. Two kinds of name with the same bytes are never equal.
 
 The review shapes, a comment, a correction and an approval, are built on these
 in [`is_review_shapes`](https://github.com/intersyntactic/review_shapes), for
@@ -62,9 +66,10 @@ the modules where a person judges something.
   id already written, and allowing less would. It holds an id, never a display
   name. Every id the Slack module writes fits it (Slack's own `U…`, `T…:U…`,
   `B…`, and agent ids like `slack:c0`).
-- **How a node becomes bytes.** There is no `toJson` yet. The line mints a
-  `TurnId` by hashing a node, and a `SemanticAnchor` by hashing its shape and
-  identity fields, so the encoding belongs with that hash, not here.
+- **How a node becomes bytes.** `TurnId.of` and `SemanticAnchor.of` hash the
+  bytes they are given. Which bytes those are (a node as the line stores it;
+  a shape and its identity fields, encoded) is the line's and the shape
+  language's to say, so there is no `toJson` here yet.
 - **Withdrawing a withdrawal.** `Withdraw<Withdraw<X>>` type-checks. Neither
   Hart nor Slack needs it, since changing your mind back is a new node with a
   new id, so readers should ignore one. That waits on a ruling in
@@ -73,8 +78,9 @@ the modules where a person judges something.
 ## The pure list
 
 A shape file may import only what import admission's pure list allows
-([#1046](https://github.com/enspyrco/intersyntactic/issues/1046)), so this
-package imports nothing at all, and it has to be added to that list.
+([#1046](https://github.com/enspyrco/intersyntactic/issues/1046)). This
+package imports only `is_content_id`, which imports only `dart:typed_data`;
+both have to be added to that list.
 `test/pure_list_test.dart` holds it to the list, and it reads every branch of
 a conditional import, not only the first.
 
@@ -87,3 +93,6 @@ dependencies:
   is_shapes:
     git: git@github.com:intersyntactic/shapes.git
 ```
+
+It is published after `is_content_id`, and before `is_review_shapes`, since
+each depends on the one before.

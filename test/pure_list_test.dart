@@ -13,7 +13,12 @@ const _pureSdk = {
   'dart:math',
   'dart:typed_data',
 };
-const _purePackages = {'checked_json', 'is_tools_api', 'is_shapes'};
+const _purePackages = {
+  'checked_json',
+  'is_tools_api',
+  'is_content_id',
+  'is_shapes',
+};
 
 /// Every URI a source's directives name, in every branch: a conditional
 /// import names one URI per branch, and the analyzer's element model holds
