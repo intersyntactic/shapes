@@ -193,16 +193,12 @@ final class SemanticAnchor extends Sha256Name {
   };
 }
 
-/// Who wrote a node: a person, or an agent.
+/// Who wrote a node: a person, or an agent, by an id that stays the same for
+/// as long as they do, such as a Slack user id (`U024BE7LH`) or an agent's
+/// name (`agent:hart-79`).
 ///
-/// What a party is, and whether the roster names it, is still open
-/// (https://github.com/enspyrco/intersyntactic/issues/1073). Until that is
-/// settled, a party id is printable ASCII with no spaces, such as a Slack user
-/// id or a roster key. That is narrow on purpose: allowing more later breaks
-/// no id already written, and allowing less would.
-///
-/// It holds an id, never a display name: a name may have spaces in it, and
-/// may change.
+/// A party id is printable ASCII with no spaces. That is narrow on purpose:
+/// allowing more later breaks no id already written, and allowing less would.
 final class PartyId {
   const PartyId._(this.value);
 

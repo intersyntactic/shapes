@@ -67,11 +67,11 @@ the modules where a person judges something.
 
 ## Still open
 
-- **What a party is.** `PartyId` is printable ASCII with no spaces until the
-  roster settles it. That is narrow on purpose: allowing more later breaks no
-  id already written, and allowing less would. It holds an id, never a display
-  name. Every id the Slack module writes fits it (Slack's own `U…`, `T…:U…`,
-  `B…`, and agent ids like `slack:c0`).
+- **One person, several ids.** A `PartyId` is printable ASCII with no spaces,
+  narrow on purpose: allowing more later breaks no id already written. Each
+  module writes its own (Slack's `U…`, `T…:U…`, `B…`; agent names like
+  `slack:c0`), and nothing yet says when two of them are one person, so a
+  reader compares party ids within one module.
 - **How a node becomes bytes.** `TurnId.of` and `SemanticAnchor.of` hash the
   bytes they are given. Which bytes those are (a node as the line stores it;
   a shape and its identity fields, encoded) is the line's and the shape
