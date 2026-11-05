@@ -1,0 +1,14 @@
+name: is_shapes
+description: >-
+  What an intersyntactic shape file uses to mark the fields a node is about,
+  and to name a node, point at it in any pass, say who wrote it, and take it
+  back.
+version: 0.1.0
+repository: https://github.com/intersyntactic/shapes
+
+environment:
+  sdk: ^3.13.0
+
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.33.0
