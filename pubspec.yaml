@@ -10,11 +10,12 @@ environment:
   sdk: ^3.13.0
 
 dependencies:
-  # A git dependency until is_content_id is published; then ^0.1.0.
+  # A git dependency, pinned by commit, until is_content_id is published;
+  # then ^0.1.0.
   is_content_id:
     git:
       url: git@github.com:intersyntactic/content_id.git
-      ref: first-release
+      ref: c878d99949ce2fb17d25cf5091d6f025f80d2eac
 
 dev_dependencies:
   lints: ^6.1.0
