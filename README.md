@@ -13,15 +13,16 @@ declared once, here, for every module that needs them.
 ```dart
 import 'package:is_shapes/is_shapes.dart';
 
-/// A message is about when it was sent; its text is its value, and may be edited.
-final class Message {
-  const Message({required this.sentAt, required this.text});
+/// A note is about when it was written; its text is its value, and may be
+/// edited; its author may take it back.
+final class Note implements Withdrawable {
+  const Note({required this.sentAt, required this.text});
   @identity
   final DateTime sentAt;
   final String text;
 }
 
-final takeBack = Withdraw<Message>(target: sent, by: author);
+final takeBack = Withdraw<Note>(target: sent, by: author);
 ```
 
 ## What is here
@@ -45,7 +46,11 @@ final takeBack = Withdraw<Message>(target: sent, by: author);
 - `Target`: the two together, so a reference survives a new pass and a reader
   can tell when two nodes have come to share an anchor.
 - `PartyId`: who wrote a node, a person or an agent.
-- `Withdraw<T>`: takes back a `T`, the exact node its author wrote. Readers
+- `Withdrawable`: a shape whose nodes can be taken back says so by
+  implementing it. A withdrawal is final: changing your mind back is a new
+  node, with a new id, which no earlier withdrawal targets.
+- `Withdraw<T extends Withdrawable>`: takes back a `T`, the exact node its
+  author wrote. Readers
   apply one rule everywhere: an `X` counts while no later `Withdraw<X>` from
   its author targets it. `T` routes the withdrawal to the acceptors waiting
   on it; no field holds a `T`, so the reader that fetches the target checks
@@ -76,10 +81,6 @@ the modules where a person judges something.
   bytes they are given. Which bytes those are (a node as the line stores it;
   a shape and its identity fields, encoded) is the line's and the shape
   language's to say, so there is no `toJson` here yet.
-- **Withdrawing a withdrawal.** `Withdraw<Withdraw<X>>` type-checks. Neither
-  Hart nor Slack needs it, since changing your mind back is a new node with a
-  new id, so readers should ignore one. That waits on a ruling in
-  [#1073](https://github.com/enspyrco/intersyntactic/issues/1073).
 
 ## The pure list
 

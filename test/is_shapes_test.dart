@@ -6,10 +6,10 @@ import 'package:test/test.dart';
 
 const _hex = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 
-/// Two shapes as a module declares them.
-final class _Reaction {}
+/// Two shapes as a module declares them, both of which can be taken back.
+final class _Reaction implements Withdrawable {}
 
-final class _Message {}
+final class _Message implements Withdrawable {}
 
 /// A value as a module declares one.
 final class _Level extends Value {

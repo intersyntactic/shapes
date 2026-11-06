@@ -2,10 +2,10 @@
 // identity marked. Then a node of it taken back.
 import 'package:is_shapes/is_shapes.dart';
 
-/// A message: what it is about is when it was sent; its text may be edited
-/// without it becoming a different message.
-final class Message {
-  const Message({required this.sentAt, required this.text});
+/// A note: what it is about is when it was written; its text may be edited
+/// without it becoming a different note, and its author may take it back.
+final class Note implements Withdrawable {
+  const Note({required this.sentAt, required this.text});
   @identity
   final DateTime sentAt;
   final String text;
@@ -19,6 +19,6 @@ void main() {
   final author = PartyId.parse('U024BE7LH');
   if (sent == null || author == null) return;
 
-  final withdrawal = Withdraw<Message>(target: sent, by: author);
+  final withdrawal = Withdraw<Note>(target: sent, by: author);
   print('${withdrawal.by} took back ${withdrawal.target}');
 }

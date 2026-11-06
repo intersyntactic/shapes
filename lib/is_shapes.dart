@@ -14,7 +14,8 @@
 /// - [TurnId], [SemanticAnchor], and the [Target] made of the two: a node,
 ///   exactly and in any pass.
 /// - [PartyId]: who wrote a node.
-/// - [Withdraw]: takes back a node its author wrote.
+/// - [Withdraw]: takes back a node its author wrote, of a shape that is
+///   [Withdrawable].
 ///
 /// The review shapes, a comment, a correction and an approval, are built on
 /// these in `is_review_shapes`, for the modules where a person judges
@@ -103,6 +104,18 @@ abstract base class Value {
   const Value();
 }
 
+/// A shape whose nodes can be taken back. A shape says so by implementing
+/// it, and [Withdraw] takes only these:
+///
+/// ```dart
+/// final class Approve implements Withdrawable { ... }
+/// ```
+///
+/// A withdrawal is final. Changing your mind back is a new node, with a new
+/// id, which no earlier withdrawal targets, so a reader asks one question of
+/// any node: is there a later withdrawal of it from its author?
+abstract interface class Withdrawable {}
+
 /// Takes back a [T]: the node at [target], which [by] wrote.
 ///
 /// A node is never changed once written, so taking one back is a new node.
@@ -117,7 +130,7 @@ abstract base class Value {
 ///
 /// [target] is the exact node, not an anchor: what is taken back is the one
 /// node its author wrote, not whatever is at its anchor in a later pass.
-final class Withdraw<T extends Object> {
+final class Withdraw<T extends Withdrawable> {
   const Withdraw({required this.target, required this.by});
 
   /// The node taken back.
