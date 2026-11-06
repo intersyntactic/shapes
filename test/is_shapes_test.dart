@@ -17,7 +17,7 @@ final class _Level extends Value {
   final int level;
 }
 
-PartyId _peter() => PartyId.parse('slack:T0001/U024BE7LH')!;
+ActorId _peter() => ActorId.parse('slack:T0001/U024BE7LH')!;
 
 void main() {
   group('TurnId and SemanticAnchor', () {
@@ -66,7 +66,7 @@ void main() {
     });
   });
 
-  group('PartyId', () {
+  group('ActorId', () {
     test('parse reads a source, a colon, and the rest', () {
       for (final s in [
         'slack:T0001/U024BE7LH',
@@ -74,7 +74,7 @@ void main() {
         'agent:example',
         'a0-b:!~',
       ]) {
-        expect(PartyId.parse(s)?.value, s);
+        expect(ActorId.parse(s)?.value, s);
       }
     });
 
@@ -93,18 +93,18 @@ void main() {
         'slack:tab\t',
         'slack:ñame',
       ]) {
-        expect(PartyId.parse(s), isNull, reason: s);
+        expect(ActorId.parse(s), isNull, reason: s);
       }
     });
 
-    test('equal to a party id with the same text', () {
+    test('equal to an actor id with the same text', () {
       expect(
-        PartyId.parse('slack:T0001/U024BE7LH'),
-        PartyId.parse('slack:T0001/U024BE7LH'),
+        ActorId.parse('slack:T0001/U024BE7LH'),
+        ActorId.parse('slack:T0001/U024BE7LH'),
       );
       expect(
-        PartyId.parse('slack:T0001/U024BE7LH'),
-        isNot(PartyId.parse('slack:T0001/U024BE7LI')),
+        ActorId.parse('slack:T0001/U024BE7LH'),
+        isNot(ActorId.parse('slack:T0001/U024BE7LI')),
       );
     });
   });

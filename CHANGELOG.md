@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.2.1
+## 0.3.0
 
-- Docs: an agent's party id is `agent:<id>`, an opaque id its install mints
+- **Breaking:** `PartyId` is renamed `ActorId`, and "party" is "actor"
+  throughout: an actor is anyone who writes a node or is named in one.
+  Nothing else about the id changes: `ActorId.parse` reads the same
+  `<source>:<rest>` grammar.
+- Docs: an agent's actor id is `agent:<id>`, an opaque id its install mints
   on first boot, not the agent's name, which can change.
 
 ## 0.2.0
