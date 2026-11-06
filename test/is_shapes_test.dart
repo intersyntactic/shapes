@@ -17,7 +17,7 @@ final class _Level extends Value {
   final int level;
 }
 
-PartyId _peter() => PartyId.parse('U024BE7LH')!;
+PartyId _peter() => PartyId.parse('slack:U024BE7LH')!;
 
 void main() {
   group('TurnId and SemanticAnchor', () {
@@ -67,21 +67,45 @@ void main() {
   });
 
   group('PartyId', () {
-    test('parse reads printable ASCII with no spaces', () {
-      for (final s in ['U024BE7LH', 'T0001:U024BE7LH', 'agent:hart-79']) {
+    test('parse reads a source, a colon, and the rest', () {
+      for (final s in [
+        'slack:U024BE7LH',
+        'slack:T0001:U024BE7LH',
+        'agent:hart-79',
+        'a0-b:!~',
+      ]) {
         expect(PartyId.parse(s)?.value, s);
       }
     });
 
     test('parse refuses anything else', () {
-      for (final s in ['', ' ', 'two words', 'line\n', 'tab\t', 'ñame']) {
+      for (final s in [
+        '',
+        'U024BE7LH',
+        ':U024BE7LH',
+        'slack:',
+        'T0001:U024BE7LH',
+        '0a:b',
+        '-a:b',
+        'a_b:c',
+        'slack:two words',
+        'slack:line\n',
+        'slack:tab\t',
+        'slack:ñame',
+      ]) {
         expect(PartyId.parse(s), isNull, reason: s);
       }
     });
 
     test('equal to a party id with the same text', () {
-      expect(PartyId.parse('U024BE7LH'), PartyId.parse('U024BE7LH'));
-      expect(PartyId.parse('U024BE7LH'), isNot(PartyId.parse('U024BE7LI')));
+      expect(
+        PartyId.parse('slack:U024BE7LH'),
+        PartyId.parse('slack:U024BE7LH'),
+      );
+      expect(
+        PartyId.parse('slack:U024BE7LH'),
+        isNot(PartyId.parse('slack:U024BE7LI')),
+      );
     });
   });
 

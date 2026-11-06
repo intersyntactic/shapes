@@ -3,7 +3,7 @@ description: >-
   What an intersyntactic shape file uses to mark the fields a node is about,
   and to name a node, point at it in any pass, say who wrote it, and take it
   back.
-version: 0.1.0
+version: 0.2.0
 repository: https://github.com/intersyntactic/shapes
 
 environment:

@@ -38,7 +38,7 @@ import 'dart:typed_data';
 
 import 'package:is_content_id/is_content_id.dart';
 
-final _printableAscii = RegExp(r'^[\x21-\x7e]+$');
+final _partyId = RegExp(r'^[a-z][a-z0-9-]*:[\x21-\x7e]+$');
 
 /// Marks a field of a shape as identity: what the node is about. Every other
 /// field is its value: what it currently says.
@@ -207,21 +207,27 @@ final class SemanticAnchor extends Sha256Name {
 }
 
 /// Who wrote a node: a person, or an agent, by an id that stays the same for
-/// as long as they do, such as a Slack user id (`U024BE7LH`) or an agent's
-/// name (`agent:hart-79`).
+/// as long as they do, prefixed by the source that minted it, such as a Slack
+/// user id (`slack:U024BE7LH`) or an agent's name (`agent:hart-79`).
 ///
-/// A party id is printable ASCII with no spaces. That is narrow on purpose:
-/// allowing more later breaks no id already written, and allowing less would.
+/// A party id is a source, a colon, and the rest. The source is a lower-case
+/// letter, then lower-case letters, digits or hyphens. The rest is printable
+/// ASCII with no spaces, and is the source's business, further colons
+/// included. Like a URI's scheme, the prefix says who owns the rest, so two
+/// modules never write the same id for two parties. Saying that two ids are
+/// one person is a table beside them, which changes no id already written.
+///
+/// That is narrow on purpose: allowing more later breaks no id already
+/// written, and allowing less would.
 final class PartyId {
   const PartyId._(this.value);
 
   /// The id, as text.
   final String value;
 
-  /// [s] as a party id, read back from text; null unless it is one or more
-  /// printable ASCII characters, none of them a space.
-  static PartyId? parse(String s) =>
-      _printableAscii.hasMatch(s) ? PartyId._(s) : null;
+  /// [s] as a party id, read back from text; null unless it is a source, a
+  /// colon, and the rest.
+  static PartyId? parse(String s) => _partyId.hasMatch(s) ? PartyId._(s) : null;
 
   @override
   bool operator ==(Object other) => other is PartyId && other.value == value;
