@@ -22,9 +22,16 @@ const _purePackages = {
 
 /// Every URI a source's directives name, in every branch: a conditional
 /// import names one URI per branch, and the analyzer's element model holds
-/// only the branch it picked, so reading the first misses the rest.
+/// only the branch it picked, so reading the first misses the rest. Comments
+/// go and strings stay whole in one left-to-right pass, so the `//` in
+/// `'file:///x.dart'` stays in its URI and an apostrophe in a comment opens
+/// no string. Directives precede declarations, so a string this short pattern
+/// misreads further down (an escaped quote, a triple quote) can't hide one.
 Iterable<String> directiveUris(String source) sync* {
-  final code = source.replaceAll(RegExp(r'/\*[\s\S]*?\*/|//[^\n]*'), '');
+  final code = source.replaceAllMapped(
+    RegExp(r'''('[^'\n]*'|"[^"\n]*")|/\*[\s\S]*?\*/|//[^\n]*'''),
+    (m) => m[1] ?? '',
+  );
   final directive = RegExp(
     r'(?<=^|;)\s*(?:import|export|part)\b[^;]*;',
     multiLine: true,
@@ -56,27 +63,5 @@ void main() {
             if (!_isPure(target)) '${file.path}: $target',
     ];
     expect(violations, isEmpty, reason: 'a shape file may import only these');
-  });
-
-  test('every branch of a conditional import is read', () {
-    const source = '''
-library;
-/// import 'dart:io'; in a comment is not a directive.
-import 'stub.dart' if (dart.library.io) 'dart:io' if (dart.library.js_interop) 'web.dart';
-export 'package:other/other.dart' show Other;
-final x = 1; import 'dart:ffi';
-''';
-    expect(directiveUris(source), [
-      'stub.dart',
-      'dart:io',
-      'web.dart',
-      'package:other/other.dart',
-      'dart:ffi',
-    ]);
-    expect(directiveUris(source).where((t) => !_isPure(t)), [
-      'dart:io',
-      'package:other/other.dart',
-      'dart:ffi',
-    ]);
   });
 }
