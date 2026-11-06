@@ -46,7 +46,7 @@ final takeBack = Withdraw<Note>(target: sent, by: author);
 - `Target`: the two together, so a reference survives a new pass and a reader
   can tell when two nodes have come to share an anchor.
 - `PartyId`: who wrote a node, a person or an agent, prefixed by the source
-  that minted it: `slack:U024BE7LH`, `agent:hart-79`.
+  that minted it: `slack:T0001/U024BE7LH`, `agent:hart-79`.
 - `Withdrawable`: a shape whose nodes can be taken back says so by
   implementing it. A withdrawal is final: changing your mind back is a new
   node, with a new id, which no earlier withdrawal targets.
@@ -74,10 +74,10 @@ the modules where a person judges something.
 ## Still open
 
 - **One person, several ids.** Each source mints its own party ids
-  (`slack:U…`, `slack:T…:U…`, `agent:hart-79`), and the prefix keeps them
-  apart, so ids from two modules never collide. Nothing yet says when two of
-  them are one person. That will be a table beside the ids, which changes no
-  id already written.
+  (`slack:T…/U…`, `agent:hart-79`), and the prefix keeps them apart, so ids
+  from two modules never collide. Nothing yet says when two of them are one
+  person, in two modules or in two Slack workspaces. That will be a table
+  beside the ids, which changes no id already written.
 - **How a node becomes bytes.** `TurnId.of` and `SemanticAnchor.of` hash the
   bytes they are given. Which bytes those are (a node as the line stores it;
   a shape and its identity fields, encoded) is the line's and the shape

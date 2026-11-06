@@ -208,7 +208,7 @@ final class SemanticAnchor extends Sha256Name {
 
 /// Who wrote a node: a person, or an agent, by an id that stays the same for
 /// as long as they do, prefixed by the source that minted it, such as a Slack
-/// user id (`slack:U024BE7LH`) or an agent's name (`agent:hart-79`).
+/// user (`slack:T0001/U024BE7LH`) or an agent's name (`agent:hart-79`).
 ///
 /// A party id is a source, a colon, and the rest. The source is a lower-case
 /// letter, then lower-case letters, digits or hyphens. The rest is printable
