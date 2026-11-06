@@ -13,5 +13,6 @@ dependencies:
   is_content_id: ^0.1.0
 
 dev_dependencies:
+  analyzer: ^14.7.0
   lints: ^6.1.0
   test: ^1.33.0

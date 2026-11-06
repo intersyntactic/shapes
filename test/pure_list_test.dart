@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:test/test.dart';
 
 /// Import admission's pure list
@@ -20,24 +22,29 @@ const _purePackages = {
   'is_shapes',
 };
 
-/// Every URI a source's directives name, in every branch: a conditional
-/// import names one URI per branch, and the analyzer's element model holds
-/// only the branch it picked, so reading the first misses the rest.
-Iterable<String> directiveUris(String source) sync* {
-  final code = source.replaceAll(RegExp(r'/\*[\s\S]*?\*/|//[^\n]*'), '');
-  final directive = RegExp(
-    r'(?<=^|;)\s*(?:import|export|part)\b[^;]*;',
-    multiLine: true,
-  );
-  final quoted = RegExp(r'''['"]([^'"]*)['"]''');
-  for (final d in directive.allMatches(code)) {
-    for (final q in quoted.allMatches(d[0]!)) {
-      yield q[1]!;
-    }
+/// Every URI a source's directives name, in every branch, as written, read
+/// from its parse tree: a conditional import keeps one [Configuration] per
+/// branch there, where the analyzer's element model holds only the branch it
+/// picked. The parser already knows comments, strings and metadata, so nothing
+/// here reads them again. The switch covers the sealed [Directive]
+/// exhaustively, so a new kind of directive stops this compiling.
+Iterable<StringLiteral> directiveUris(String source) sync* {
+  final unit = parseString(content: source, throwIfDiagnostics: false).unit;
+  for (final directive in unit.directives) {
+    yield* switch (directive) {
+      NamespaceDirective(:final uri, :final configurations) => [
+        uri,
+        for (final branch in configurations) branch.uri,
+      ],
+      PartDirective(:final uri) => [uri],
+      LibraryDirective() || PartOfDirective() => const <StringLiteral>[],
+    };
   }
 }
 
-bool _isPure(String target) {
+bool _isPure(StringLiteral literal) {
+  final target = literal.stringValue;
+  if (target == null) return false;
   final uri = Uri.parse(target);
   return switch (uri.scheme) {
     'dart' => _pureSdk.contains(target),
@@ -52,31 +59,9 @@ void main() {
     final violations = [
       for (final file in Directory('lib').listSync(recursive: true))
         if (file is File && file.path.endsWith('.dart'))
-          for (final target in directiveUris(file.readAsStringSync()))
-            if (!_isPure(target)) '${file.path}: $target',
+          for (final uri in directiveUris(file.readAsStringSync()))
+            if (!_isPure(uri)) '${file.path}: ${uri.toSource()}',
     ];
     expect(violations, isEmpty, reason: 'a shape file may import only these');
-  });
-
-  test('every branch of a conditional import is read', () {
-    const source = '''
-library;
-/// import 'dart:io'; in a comment is not a directive.
-import 'stub.dart' if (dart.library.io) 'dart:io' if (dart.library.js_interop) 'web.dart';
-export 'package:other/other.dart' show Other;
-final x = 1; import 'dart:ffi';
-''';
-    expect(directiveUris(source), [
-      'stub.dart',
-      'dart:io',
-      'web.dart',
-      'package:other/other.dart',
-      'dart:ffi',
-    ]);
-    expect(directiveUris(source).where((t) => !_isPure(t)), [
-      'dart:io',
-      'package:other/other.dart',
-      'dart:ffi',
-    ]);
   });
 }
