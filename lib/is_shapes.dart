@@ -13,12 +13,12 @@
 ///   it into one type that can be revised whole.
 /// - [TurnId], [SemanticAnchor], and the [Target] made of the two: a node,
 ///   exactly and in any pass.
-/// - [PartyId]: who wrote a node.
+/// - [ActorId]: who wrote a node.
 /// - [Withdraw]: takes back a node its author wrote, of a shape that is
 ///   [Withdrawable].
 ///
 /// The annotation shapes, a comment, a correction and an approval, are built
-/// on these in `is_annotation_shapes`. An annotation is a node a party writes
+/// on these in `is_annotation_shapes`. An annotation is a node an actor writes
 /// beside another node: it points at that node and never changes it.
 ///
 /// An id is a class with a library-private constructor, made by `of`, which
@@ -38,7 +38,7 @@ import 'dart:typed_data';
 
 import 'package:is_content_id/is_content_id.dart';
 
-final _partyId = RegExp(r'^[a-z][a-z0-9-]*:[\x21-\x7e]+$');
+final _actorId = RegExp(r'^[a-z][a-z0-9-]*:[\x21-\x7e]+$');
 
 /// Marks a field of a shape as identity: what the node is about. Every other
 /// field is its value: what it currently says.
@@ -138,7 +138,7 @@ final class Withdraw<T extends Withdrawable> {
   final TurnId target;
 
   /// Who took it back. It counts only if this is who wrote [target].
-  final PartyId by;
+  final ActorId by;
 }
 
 /// A node, both exactly and in any pass: the node that was seen, and its
@@ -209,30 +209,31 @@ final class SemanticAnchor extends Sha256Name {
 
 /// Who wrote a node: a person, or an agent, by an id that stays the same for
 /// as long as they do, prefixed by the source that minted it, such as a Slack
-/// user (`slack:T0001/U024BE7LH`) or an agent's name, which it chooses
-/// (`agent:example`).
+/// user (`slack:T0001/U024BE7LH`) or an agent (`agent:<id>`, an opaque id its
+/// install mints on first boot). An agent's name is not part of its id: the
+/// name can change, and the id never does.
 ///
-/// A party id is a source, a colon, and the rest. The source is a lower-case
+/// An actor id is a source, a colon, and the rest. The source is a lower-case
 /// letter, then lower-case letters, digits or hyphens. The rest is printable
 /// ASCII with no spaces, and is the source's business, further colons
 /// included. Like a URI's scheme, the prefix says who owns the rest, so two
-/// modules never write the same id for two parties. Saying that two ids are
+/// modules never write the same id for two actors. Saying that two ids are
 /// one person is a table beside them, which changes no id already written.
 ///
 /// That is narrow on purpose: allowing more later breaks no id already
 /// written, and allowing less would.
-final class PartyId {
-  const PartyId._(this.value);
+final class ActorId {
+  const ActorId._(this.value);
 
   /// The id, as text.
   final String value;
 
-  /// [s] as a party id, read back from text; null unless it is a source, a
+  /// [s] as an actor id, read back from text; null unless it is a source, a
   /// colon, and the rest.
-  static PartyId? parse(String s) => _partyId.hasMatch(s) ? PartyId._(s) : null;
+  static ActorId? parse(String s) => _actorId.hasMatch(s) ? ActorId._(s) : null;
 
   @override
-  bool operator ==(Object other) => other is PartyId && other.value == value;
+  bool operator ==(Object other) => other is ActorId && other.value == value;
 
   @override
   int get hashCode => value.hashCode;

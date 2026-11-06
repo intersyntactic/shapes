@@ -45,9 +45,10 @@ final takeBack = Withdraw<Note>(target: sent, by: author);
   identity fields only.
 - `Target`: the two together, so a reference survives a new pass and a reader
   can tell when two nodes have come to share an anchor.
-- `PartyId`: who wrote a node, a person or an agent, prefixed by the source
-  that minted it: `slack:T0001/U024BE7LH`, or `agent:` and the name the agent
-  chooses, such as `agent:example`.
+- `ActorId`: who wrote a node, a person or an agent, prefixed by the source
+  that minted it: `slack:T0001/U024BE7LH`, or `agent:<id>`, an opaque id the
+  agent's install mints on first boot. An agent's name can change; its id
+  never does.
 - `Withdrawable`: a shape whose nodes can be taken back says so by
   implementing it. A withdrawal is final: changing your mind back is a new
   node, with a new id, which no earlier withdrawal targets.
@@ -70,14 +71,14 @@ checked in one place. Two kinds of name with the same bytes are never equal.
 
 The annotation shapes, a comment, a correction and an approval, are built on
 these in [`is_annotation_shapes`](https://github.com/intersyntactic/annotation_shapes).
-An annotation is a node a party writes beside another node: it points at that
+An annotation is a node an actor writes beside another node: it points at that
 node and never changes it, as in the
 [W3C Web Annotation model](https://www.w3.org/TR/annotation-model/).
 
 ## Still open
 
-- **One person, several ids.** Each source mints its own party ids
-  (`slack:T…/U…`, `agent:<name>`), and the prefix keeps them apart, so ids
+- **One person, several ids.** Each source mints its own actor ids
+  (`slack:T…/U…`, `agent:<id>`), and the prefix keeps them apart, so ids
   from two modules never collide. Nothing yet says when two of them are one
   person, in two modules or in two Slack workspaces. That will be a table
   beside the ids, which changes no id already written.

@@ -16,7 +16,7 @@ void main() {
   final sent = TurnId.parse(
     'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
   );
-  final author = PartyId.parse('slack:T0001/U024BE7LH');
+  final author = ActorId.parse('slack:T0001/U024BE7LH');
   if (sent == null || author == null) return;
 
   final withdrawal = Withdraw<Note>(target: sent, by: author);
