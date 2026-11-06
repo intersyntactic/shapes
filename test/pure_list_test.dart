@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:test/test.dart';
 
 /// Import admission's pure list
@@ -20,31 +22,25 @@ const _purePackages = {
   'is_shapes',
 };
 
-/// Every URI a source's directives name, in every branch: a conditional
-/// import names one URI per branch, and the analyzer's element model holds
-/// only the branch it picked, so reading the first misses the rest. Comments
-/// go and strings stay whole in one left-to-right pass, so the `//` in
-/// `'file:///x.dart'` stays in its URI and an apostrophe in a comment opens
-/// no string. Directives precede declarations, so a string this short pattern
-/// misreads further down (an escaped quote, a triple quote) can't hide one.
-Iterable<String> directiveUris(String source) sync* {
-  final code = source.replaceAllMapped(
-    RegExp(r'''('[^'\n]*'|"[^"\n]*")|/\*[\s\S]*?\*/|//[^\n]*'''),
-    (m) => m[1] ?? '',
-  );
-  final directive = RegExp(
-    r'(?<=^|;)\s*(?:import|export|part)\b[^;]*;',
-    multiLine: true,
-  );
-  final quoted = RegExp(r'''['"]([^'"]*)['"]''');
-  for (final d in directive.allMatches(code)) {
-    for (final q in quoted.allMatches(d[0]!)) {
-      yield q[1]!;
+/// Every URI a source's directives name, in every branch, read from its parse
+/// tree: a conditional import keeps one [Configuration] per branch there,
+/// where the analyzer's element model holds only the branch it picked. The
+/// parser already knows comments, strings and metadata, so nothing here reads
+/// them again. A URI that isn't a plain string is null.
+Iterable<String?> directiveUris(String source) sync* {
+  final unit = parseString(content: source, throwIfDiagnostics: false).unit;
+  for (final directive in unit.directives.whereType<UriBasedDirective>()) {
+    yield directive.uri.stringValue;
+    if (directive is NamespaceDirective) {
+      for (final branch in directive.configurations) {
+        yield branch.uri.stringValue;
+      }
     }
   }
 }
 
-bool _isPure(String target) {
+bool _isPure(String? target) {
+  if (target == null) return false;
   final uri = Uri.parse(target);
   return switch (uri.scheme) {
     'dart' => _pureSdk.contains(target),
