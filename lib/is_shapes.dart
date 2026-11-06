@@ -17,9 +17,9 @@
 /// - [Withdraw]: takes back a node its author wrote, of a shape that is
 ///   [Withdrawable].
 ///
-/// The review shapes, a comment, a correction and an approval, are built on
-/// these in `is_review_shapes`, for the modules where a person judges
-/// something.
+/// The annotation shapes, a comment, a correction and an approval, are built
+/// on these in `is_annotation_shapes`. An annotation is a node a party writes
+/// beside another node: it points at that node and never changes it.
 ///
 /// An id is a class with a library-private constructor, made by `of`, which
 /// hashes, or by `parse`, which returns null for a malformed one. So code
@@ -58,11 +58,12 @@ final _partyId = RegExp(r'^[a-z][a-z0-9-]*:[\x21-\x7e]+$');
 ///
 /// Nothing runs it. The analyzer reads it from a shape file's source, by its
 /// type, [Identity] (https://github.com/enspyrco/intersyntactic/issues/1069).
-/// Only a field's annotations are read.
+/// Only a field's metadata annotations are read.
 const identity = Identity._();
 
 /// The type of [identity]. Its constructor is private, so [identity] is the
-/// only one, and a reader looking for the annotation looks for this type.
+/// only one, and a reader looking for the metadata annotation looks for this
+/// type.
 final class Identity {
   const Identity._();
 }
@@ -89,7 +90,7 @@ final class Identity {
 /// ```
 ///
 /// A correction is generic over the value it proposes, bounded by this class
-/// (`Correction<V extends Value>`, in `is_review_shapes`). Classes match by
+/// (`Correction<V extends Value>`, in `is_annotation_shapes`). Classes match by
 /// name, so the analyzer refuses a correction that proposes one shape's value
 /// to another, even when their fields are the same. A record or an extension
 /// type can't extend a class, so neither can be a value; and a class survives
@@ -208,7 +209,8 @@ final class SemanticAnchor extends Sha256Name {
 
 /// Who wrote a node: a person, or an agent, by an id that stays the same for
 /// as long as they do, prefixed by the source that minted it, such as a Slack
-/// user (`slack:T0001/U024BE7LH`) or an agent's name (`agent:hart-79`).
+/// user (`slack:T0001/U024BE7LH`) or an agent's name, which it chooses
+/// (`agent:example`).
 ///
 /// A party id is a source, a colon, and the rest. The source is a lower-case
 /// letter, then lower-case letters, digits or hyphens. The rest is printable

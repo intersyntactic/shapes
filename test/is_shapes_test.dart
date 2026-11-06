@@ -71,7 +71,7 @@ void main() {
       for (final s in [
         'slack:T0001/U024BE7LH',
         'a:b:c',
-        'agent:hart-79',
+        'agent:example',
         'a0-b:!~',
       ]) {
         expect(PartyId.parse(s)?.value, s);

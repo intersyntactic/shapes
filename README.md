@@ -36,7 +36,7 @@ final takeBack = Withdraw<Note>(target: sent, by: author);
 - `Value`: the other half of a shape. A shape that can be corrected gathers
   its value into one class extending `Value`, under whatever name fits it
   (Hart's `RungVerdict extends Value`), and `Correction<V extends Value>` in
-  `is_review_shapes` proposes a new one. It is `abstract base`: another
+  `is_annotation_shapes` proposes a new one. It is `abstract base`: another
   library can extend it but not implement it, and a record or an extension
   type can't be one. Declare values `final`.
 - `TurnId`: one exact node: the sha256 of its parent's id and its own bytes,
@@ -46,7 +46,8 @@ final takeBack = Withdraw<Note>(target: sent, by: author);
 - `Target`: the two together, so a reference survives a new pass and a reader
   can tell when two nodes have come to share an anchor.
 - `PartyId`: who wrote a node, a person or an agent, prefixed by the source
-  that minted it: `slack:T0001/U024BE7LH`, `agent:hart-79`.
+  that minted it: `slack:T0001/U024BE7LH`, or `agent:` and the name the agent
+  chooses, such as `agent:example`.
 - `Withdrawable`: a shape whose nodes can be taken back says so by
   implementing it. A withdrawal is final: changing your mind back is a new
   node, with a new id, which no earlier withdrawal targets.
@@ -67,14 +68,16 @@ the check. `TurnId` and `SemanticAnchor` are `Sha256Name`s from
 `sha256`, so every name in intersyntactic is made by one sha256 that can be
 checked in one place. Two kinds of name with the same bytes are never equal.
 
-The review shapes, a comment, a correction and an approval, are built on these
-in [`is_review_shapes`](https://github.com/intersyntactic/review_shapes), for
-the modules where a person judges something.
+The annotation shapes, a comment, a correction and an approval, are built on
+these in [`is_annotation_shapes`](https://github.com/intersyntactic/annotation_shapes).
+An annotation is a node a party writes beside another node: it points at that
+node and never changes it, as in the
+[W3C Web Annotation model](https://www.w3.org/TR/annotation-model/).
 
 ## Still open
 
 - **One person, several ids.** Each source mints its own party ids
-  (`slack:T…/U…`, `agent:hart-79`), and the prefix keeps them apart, so ids
+  (`slack:T…/U…`, `agent:<name>`), and the prefix keeps them apart, so ids
   from two modules never collide. Nothing yet says when two of them are one
   person, in two modules or in two Slack workspaces. That will be a table
   beside the ids, which changes no id already written.
@@ -99,5 +102,5 @@ dependencies:
   is_shapes: ^0.2.0
 ```
 
-It is published after `is_content_id`, and before `is_review_shapes`, since
+It is published after `is_content_id`, and before `is_annotation_shapes`, since
 each depends on the one before.

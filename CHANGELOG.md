@@ -8,6 +8,9 @@
   letter, then lower-case letters, digits or hyphens; the rest is printable
   ASCII with no spaces, further colons included. Ids from two modules can no
   longer collide (https://github.com/intersyntactic/shapes/issues/4).
+- The docs name `is_annotation_shapes`, which `is_review_shapes` was renamed
+  to, and call `@identity` a metadata annotation, leaving "annotation" to a
+  node written beside another.
 
 ## 0.1.0
 
