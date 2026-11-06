@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- Docs: an agent's party id is `agent:<id>`, an opaque id its install mints
+  on first boot, not the agent's name, which can change.
+
 ## 0.2.0
 
 - **Breaking:** a `PartyId` is prefixed by the source that minted it, so
