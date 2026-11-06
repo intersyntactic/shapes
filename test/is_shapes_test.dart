@@ -74,7 +74,7 @@ void main() {
     });
 
     test('parse refuses anything else', () {
-      for (final s in ['', ' ', 'nick meinhold', 'nick\n', 'nick\t', 'ñick']) {
+      for (final s in ['', ' ', 'two words', 'line\n', 'tab\t', 'ñame']) {
         expect(PartyId.parse(s), isNull, reason: s);
       }
     });
