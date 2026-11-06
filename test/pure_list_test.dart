@@ -22,24 +22,28 @@ const _purePackages = {
   'is_shapes',
 };
 
-/// Every URI a source's directives name, in every branch, read from its parse
-/// tree: a conditional import keeps one [Configuration] per branch there,
-/// where the analyzer's element model holds only the branch it picked. The
-/// parser already knows comments, strings and metadata, so nothing here reads
-/// them again. A URI that isn't a plain string is null.
-Iterable<String?> directiveUris(String source) sync* {
+/// Every URI a source's directives name, in every branch, as written, read
+/// from its parse tree: a conditional import keeps one [Configuration] per
+/// branch there, where the analyzer's element model holds only the branch it
+/// picked. The parser already knows comments, strings and metadata, so nothing
+/// here reads them again. The switch covers the sealed [Directive]
+/// exhaustively, so a new kind of directive stops this compiling.
+Iterable<StringLiteral> directiveUris(String source) sync* {
   final unit = parseString(content: source, throwIfDiagnostics: false).unit;
-  for (final directive in unit.directives.whereType<UriBasedDirective>()) {
-    yield directive.uri.stringValue;
-    if (directive is NamespaceDirective) {
-      for (final branch in directive.configurations) {
-        yield branch.uri.stringValue;
-      }
-    }
+  for (final directive in unit.directives) {
+    yield* switch (directive) {
+      NamespaceDirective(:final uri, :final configurations) => [
+        uri,
+        for (final branch in configurations) branch.uri,
+      ],
+      PartDirective(:final uri) => [uri],
+      LibraryDirective() || PartOfDirective() => const <StringLiteral>[],
+    };
   }
 }
 
-bool _isPure(String? target) {
+bool _isPure(StringLiteral literal) {
+  final target = literal.stringValue;
   if (target == null) return false;
   final uri = Uri.parse(target);
   return switch (uri.scheme) {
@@ -55,8 +59,8 @@ void main() {
     final violations = [
       for (final file in Directory('lib').listSync(recursive: true))
         if (file is File && file.path.endsWith('.dart'))
-          for (final target in directiveUris(file.readAsStringSync()))
-            if (!_isPure(target)) '${file.path}: $target',
+          for (final uri in directiveUris(file.readAsStringSync()))
+            if (!_isPure(uri)) '${file.path}: ${uri.toSource()}',
     ];
     expect(violations, isEmpty, reason: 'a shape file may import only these');
   });
