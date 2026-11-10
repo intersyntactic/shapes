@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+- Docs: a journey's "line" is a journey path, so the docs say where a node's
+  bytes are stored in those words, and a `TurnId` names a node's whole
+  history rather than its "path".
+
 ## 0.3.0
 
 - **Breaking:** `PartyId` is renamed `ActorId`, and "party" is "actor"

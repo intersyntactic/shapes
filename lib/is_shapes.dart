@@ -167,7 +167,7 @@ final class Target {
 }
 
 /// One exact node: the sha256 of its parent's id and its own bytes, like a
-/// git commit, so it names the node's whole path. Two nodes with the same
+/// git commit, so it names the node's whole history. Two nodes with the same
 /// fields in different places have different ids.
 ///
 /// It is a different kind of name from a [SemanticAnchor] or an `ObjectId`,
@@ -175,8 +175,9 @@ final class Target {
 final class TurnId extends Sha256Name {
   TurnId._(super.digest);
 
-  /// The id of the node whose bytes, as the line stores them, are [node].
-  /// Which bytes those are is the line's to say: it is what mints a node's id.
+  /// The id of the node whose bytes, as the journey path stores them, are
+  /// [node]. Which bytes those are is the journey path's to say: it is what
+  /// mints a node's id.
   factory TurnId.of(Uint8List node) => TurnId._(sha256(node));
 
   /// [s] as a turn id, read back from text; null unless it is a sha256 in

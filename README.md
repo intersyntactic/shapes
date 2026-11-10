@@ -83,9 +83,9 @@ node and never changes it, as in the
   person, in two modules or in two Slack workspaces. That will be a table
   beside the ids, which changes no id already written.
 - **How a node becomes bytes.** `TurnId.of` and `SemanticAnchor.of` hash the
-  bytes they are given. Which bytes those are (a node as the line stores it;
-  a shape and its identity fields, encoded) is the line's and the shape
-  language's to say, so there is no `toJson` here yet.
+  bytes they are given. Which bytes those are (a node as the journey path
+  stores it; a shape and its identity fields, encoded) is the journey path's
+  and the shape language's to say, so there is no `toJson` here yet.
 
 ## The pure list
 
