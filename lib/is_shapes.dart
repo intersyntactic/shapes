@@ -14,7 +14,7 @@
 /// - [TurnId], [SemanticAnchor], and the [Target] made of the two: a node,
 ///   exactly and in any pass.
 /// - [ActorId]: who wrote a node.
-/// - [Withdraw]: takes back a node its author wrote, of a shape that is
+/// - [Withdrawal]: takes back a node its author wrote, of a shape that is
 ///   [Withdrawable].
 ///
 /// The annotation shapes, a comment, a correction and an approval, are built
@@ -106,10 +106,10 @@ abstract base class Value {
 }
 
 /// A shape whose nodes can be taken back. A shape says so by implementing
-/// it, and [Withdraw] takes only these:
+/// it, and [Withdrawal] takes only these:
 ///
 /// ```dart
-/// final class Approve implements Withdrawable { ... }
+/// final class Approval implements Withdrawable { ... }
 /// ```
 ///
 /// A withdrawal is final. Changing your mind back is a new node, with a new
@@ -121,18 +121,18 @@ abstract interface class Withdrawable {}
 ///
 /// A node is never changed once written, so taking one back is a new node.
 /// Readers apply one rule to every shape: an `X` counts while no later
-/// `Withdraw<X>` from its author targets it. A withdrawal by anyone else
+/// `Withdrawal<X>` from its author targets it. A withdrawal by anyone else
 /// counts for nothing, so a reader checks that [by] wrote [target].
 ///
 /// [T] says what is taken back, so an acceptor waiting on withdrawn approvals
-/// accepts `Withdraw<Approve>` and is never handed a withdrawn Slack reaction.
-/// No field holds a [T], so nothing here checks that [target] is one; the
-/// reader that fetches [target] does.
+/// accepts `Withdrawal<Approval>` and is never handed a withdrawn Slack
+/// reaction. No field holds a [T], so nothing here checks that [target] is
+/// one; the reader that fetches [target] does.
 ///
 /// [target] is the exact node, not an anchor: what is taken back is the one
 /// node its author wrote, not whatever is at its anchor in a later pass.
-final class Withdraw<T extends Withdrawable> {
-  const Withdraw({required this.target, required this.by});
+final class Withdrawal<T extends Withdrawable> {
+  const Withdrawal({required this.target, required this.by});
 
   /// The node taken back.
   final TurnId target;

@@ -117,12 +117,12 @@ void main() {
   });
 
   test('a withdrawal says what it takes back, at run time too', () {
-    final withdrawal = Withdraw<_Reaction>(
+    final withdrawal = Withdrawal<_Reaction>(
       target: TurnId.parse(_hex)!,
       by: _peter(),
     );
-    expect(withdrawal, isA<Withdraw<_Reaction>>());
-    expect(withdrawal, isNot(isA<Withdraw<_Message>>()));
+    expect(withdrawal, isA<Withdrawal<_Reaction>>());
+    expect(withdrawal, isNot(isA<Withdrawal<_Message>>()));
     expect(withdrawal.target, TurnId.parse(_hex));
     expect(withdrawal.by, _peter());
   });

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- **Breaking:** `Withdraw<T extends Withdrawable>` is renamed `Withdrawal<T
+  extends Withdrawable>`. A node records something that happened, so it is a
+  noun, like `Comment` and `Correction` — `Withdraw<Approve>` read as two
+  commands stuck together. `Withdrawable` is unchanged.
+
 ## 0.3.2
 
 - Require `is_content_id ^0.2.0`, so shapes no longer collides with other

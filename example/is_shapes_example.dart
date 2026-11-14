@@ -19,6 +19,6 @@ void main() {
   final author = ActorId.parse('slack:T0001/U024BE7LH');
   if (sent == null || author == null) return;
 
-  final withdrawal = Withdraw<Note>(target: sent, by: author);
+  final withdrawal = Withdrawal<Note>(target: sent, by: author);
   print('${withdrawal.by} took back ${withdrawal.target}');
 }

@@ -22,7 +22,7 @@ final class Note implements Withdrawable {
   final String text;
 }
 
-final takeBack = Withdraw<Note>(target: sent, by: author);
+final takeBack = Withdrawal<Note>(target: sent, by: author);
 ```
 
 ## What is here
@@ -52,9 +52,9 @@ final takeBack = Withdraw<Note>(target: sent, by: author);
 - `Withdrawable`: a shape whose nodes can be taken back says so by
   implementing it. A withdrawal is final: changing your mind back is a new
   node, with a new id, which no earlier withdrawal targets.
-- `Withdraw<T extends Withdrawable>`: takes back a `T`, the exact node its
+- `Withdrawal<T extends Withdrawable>`: takes back a `T`, the exact node its
   author wrote. Readers
-  apply one rule everywhere: an `X` counts while no later `Withdraw<X>` from
+  apply one rule everywhere: an `X` counts while no later `Withdrawal<X>` from
   its author targets it. `T` routes the withdrawal to the acceptors waiting
   on it; no field holds a `T`, so the reader that fetches the target checks
   it is one.
