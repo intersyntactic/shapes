@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2
+
+- Require `is_content_id ^0.2.0`, so shapes no longer collides with other
+  packages that need it.
+
 ## 0.3.1
 
 - Docs: a journey's "line" is a journey path, so the docs say where a node's

@@ -3,14 +3,14 @@ description: >-
   What an intersyntactic shape file uses to mark the fields a node is about,
   and to name a node, point at it in any pass, say who wrote it, and take it
   back.
-version: 0.3.1
+version: 0.3.2
 repository: https://github.com/intersyntactic/shapes
 
 environment:
   sdk: ^3.13.0
 
 dependencies:
-  is_content_id: ^0.1.0
+  is_content_id: ^0.2.0
 
 dev_dependencies:
   analyzer: ^14.7.0
