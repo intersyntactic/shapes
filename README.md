@@ -49,6 +49,8 @@ final takeBack = Withdrawal<Note>(target: sent, by: author);
   that minted it: `slack:T0001/U024BE7LH`, or `agent:<id>`, an opaque id the
   agent's install mints on first boot. An agent's name can change; its id
   never does.
+- `JourneyId`: a journey, named by the hash of the record entry that started
+  it, so whoever starts a journey names it.
 - `Withdrawable`: a shape whose nodes can be taken back says so by
   implementing it. A withdrawal is final: changing your mind back is a new
   node, with a new id, which no earlier withdrawal targets.

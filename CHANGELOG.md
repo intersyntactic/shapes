@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1
+
+- `JourneyId`: a journey, named by the hash of the record entry that started
+  it, the way a `TurnId` names a node. It is a `Sha256Name`, made by `of` or
+  read back by `parse`, so it cannot hold the retired server's
+  ten-character journey ids.
+
 ## 0.4.0
 
 - **Breaking:** `Withdraw<T extends Withdrawable>` is renamed `Withdrawal<T

@@ -66,6 +66,28 @@ void main() {
     });
   });
 
+  group('JourneyId', () {
+    test('parse reads a sha256 in lower-case hex, and nothing else', () {
+      expect(JourneyId.parse(_hex)?.hex, _hex);
+      for (final s in ['', _hex.toUpperCase(), '${_hex}0', 'a1b2c3d4e5']) {
+        expect(JourneyId.parse(s), isNull, reason: s);
+      }
+    });
+
+    test('of hashes the entry that started it', () {
+      expect(JourneyId.of(Uint8List(0)), JourneyId.parse(_hex));
+      expect(
+        JourneyId.of(Uint8List(0)).hashCode,
+        JourneyId.parse(_hex).hashCode,
+      );
+    });
+
+    test('never equal to another kind of name with the same bytes', () {
+      expect(JourneyId.parse(_hex), isNot(TurnId.parse(_hex)));
+      expect(JourneyId.of(Uint8List(0)), isNot(ObjectId.of(Uint8List(0))));
+    });
+  });
+
   group('ActorId', () {
     test('parse reads a source, a colon, and the rest', () {
       for (final s in [
