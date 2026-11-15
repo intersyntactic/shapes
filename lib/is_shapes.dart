@@ -14,6 +14,7 @@
 /// - [TurnId], [SemanticAnchor], and the [Target] made of the two: a node,
 ///   exactly and in any pass.
 /// - [ActorId]: who wrote a node.
+/// - [DecidedBy]: whether a decision was the rules' or the person's.
 /// - [JourneyId] and [JourneyPathId]: the journey a node is in, and the
 ///   journey path, its thread of turns, within it.
 /// - [Withdrawal]: takes back a node its author wrote, of a shape that is
@@ -293,4 +294,22 @@ final class ActorId {
 
   @override
   String toString() => value;
+}
+
+/// Who made a decision a record entry holds: the [rules], or the [person].
+/// So the record tells "the rules let it through" from "the person said
+/// yes", wherever something is decided: the airlock deciding a run, the
+/// docking port deciding an arrival.
+///
+/// A record writes a value by its [Enum.name], so the names are permanent:
+/// rename one and every entry already written says something else.
+enum DecidedBy {
+  /// Decided without asking the person, by the rules it falls under: a
+  /// journey path's rules for a run, a journey's and its turns' for an
+  /// arrival.
+  rules,
+
+  /// The person decided, when asked or on their own, as by stopping a
+  /// journey path.
+  person,
 }
