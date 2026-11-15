@@ -14,7 +14,8 @@
 /// - [TurnId], [SemanticAnchor], and the [Target] made of the two: a node,
 ///   exactly and in any pass.
 /// - [ActorId]: who wrote a node.
-/// - [JourneyId]: the journey a node's journey path is in.
+/// - [JourneyId] and [JourneyPathId]: the journey a node is in, and the
+///   journey path, its thread of turns, within it.
 /// - [Withdrawal]: takes back a node its author wrote, of a shape that is
 ///   [Withdrawable].
 ///
@@ -213,7 +214,8 @@ final class SemanticAnchor extends Sha256Name {
 /// journey names it, by writing that entry, so a journey has one name and
 /// nothing has to be asked to hand one out. It is the same hash as the
 /// entry's own, as a different kind of name, so it is never equal to the
-/// entry's hash, or to a journey path's id that the same entry started.
+/// entry's hash, or to the [JourneyPathId] of a journey path the same entry
+/// started.
 ///
 /// A journey's journey paths are its threads of turns; a Teams channel is a
 /// journey, started by its first thread, and each thread is a journey path
@@ -229,6 +231,31 @@ final class JourneyId extends Sha256Name {
   /// lower-case hex.
   static JourneyId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
     final d? => JourneyId._(d),
+    null => null,
+  };
+}
+
+/// A journey path: one thread of turns in a journey, named, like its
+/// [JourneyId], by the hash of the record entry that started it. Its entries
+/// carry it, so they can be told from every other journey path's, after a
+/// restart too.
+///
+/// A journey path is only ever started, never handed out by another: an
+/// entry can't hold its own hash, so a journey path named by an entry its
+/// parent writes would need its name before that entry exists. One that
+/// comes from another would say so in its own first entry, naming its
+/// parent, the way a git commit names its parent and never its children.
+final class JourneyPathId extends Sha256Name {
+  JourneyPathId._(super.digest);
+
+  /// The id of the journey path started by the entry whose bytes, as the
+  /// record stores them, are [entry].
+  factory JourneyPathId.of(Uint8List entry) => JourneyPathId._(sha256(entry));
+
+  /// [s] as a journey path id, read back from text; null unless it is a
+  /// sha256 in lower-case hex.
+  static JourneyPathId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
+    final d? => JourneyPathId._(d),
     null => null,
   };
 }
