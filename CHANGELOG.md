@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.3
+
+- `DecidedBy { rules, person }`: who made a decision a record entry holds,
+  shared by the airlock and the docking port. It replaces
+  `is_airlock_api`'s, with the same two names in the same order.
+
 ## 0.4.2
 
 - `JourneyPathId`: a journey path, named by the hash of the record entry

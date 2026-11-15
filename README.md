@@ -51,6 +51,8 @@ final takeBack = Withdrawal<Note>(target: sent, by: author);
   never does.
 - `JourneyId`: a journey, named by the hash of the record entry that started
   it, so whoever starts a journey names it.
+- `DecidedBy`: who made a decision a record holds, `rules` (without asking
+  the person) or `person`. Records write these names, so they never change.
 - `JourneyPathId`: a journey path, one thread of turns in a journey, named
   the same way by the entry that started it. A journey path is only ever
   started: one that came from another names its parent in its own first

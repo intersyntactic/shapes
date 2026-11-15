@@ -106,6 +106,11 @@ void main() {
     });
   });
 
+  test('DecidedBy is rules then person, by those names', () {
+    // Records write these names; changing one rewrites every entry's meaning.
+    expect(DecidedBy.values.map((v) => v.name), ['rules', 'person']);
+  });
+
   group('ActorId', () {
     test('parse reads a source, a colon, and the rest', () {
       for (final s in [
