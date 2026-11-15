@@ -88,6 +88,24 @@ void main() {
     });
   });
 
+  group('JourneyPathId', () {
+    test('parse reads a sha256 in lower-case hex, and nothing else', () {
+      expect(JourneyPathId.parse(_hex)?.hex, _hex);
+      // The airlock's old JourneyPathId took any non-blank string.
+      for (final s in ['', ' ', 'root', 'child', _hex.toUpperCase()]) {
+        expect(JourneyPathId.parse(s), isNull, reason: s);
+      }
+    });
+
+    test('of hashes the entry that started it', () {
+      expect(JourneyPathId.of(Uint8List(0)), JourneyPathId.parse(_hex));
+    });
+
+    test('never equal to the journey the same entry started', () {
+      expect(JourneyPathId.of(Uint8List(0)), isNot(JourneyId.of(Uint8List(0))));
+    });
+  });
+
   group('ActorId', () {
     test('parse reads a source, a colon, and the rest', () {
       for (final s in [

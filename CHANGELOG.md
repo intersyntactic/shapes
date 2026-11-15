@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.2
+
+- `JourneyPathId`: a journey path, named by the hash of the record entry
+  that started it, like `JourneyId`. It replaces `is_airlock_api`'s, whose
+  `parse` took any non-blank string; this one takes only a sha256 in
+  lower-case hex.
+
 ## 0.4.1
 
 - `JourneyId`: a journey, named by the hash of the record entry that started
