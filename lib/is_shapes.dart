@@ -243,9 +243,10 @@ final class EntryId extends Sha256Name {
 /// the packages it imports. So a renderer imports only the SDK part of
 /// import admission's pure list by default. One that imports a package pins
 /// it exactly in its `pubspec.yaml`, which the archive covers, but not what
-/// that package itself depends on, which can still move. The Dart SDK is in
-/// none of it: the executable's own hash, recorded beside this, names what
-/// actually ran.
+/// that package itself depends on, which can still move. So the id alone
+/// does not pin the code a renderer runs with, its dependencies or the Dart
+/// SDK: the executable's own hash, recorded beside it, names what actually
+/// ran.
 ///
 /// It cannot hold its own id, since no file can hold its own hash: whatever
 /// builds it reads the id from `pubspec.lock`.
