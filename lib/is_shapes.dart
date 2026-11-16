@@ -119,7 +119,7 @@ final class Identity {
 /// ```
 ///
 /// A correction is generic over the value it proposes, bounded by this class
-/// (`Correction<V extends Value>`, in `is_annotation_shapes`). Classes match by
+/// (`NodeCorrection<V extends Value>`, in `is_annotation_shapes`). Classes match by
 /// name, so the analyzer refuses a correction that proposes one shape's value
 /// to another, even when their fields are the same. A record or an extension
 /// type can't extend a class, so neither can be a value; and a class survives
@@ -138,7 +138,7 @@ abstract base class Value {
 /// it, and [Withdrawal] takes only these:
 ///
 /// ```dart
-/// final class Approval implements Withdrawable { ... }
+/// final class NodeApproval implements Withdrawable { ... }
 /// ```
 ///
 /// A withdrawal is final. Changing your mind back is a new node, with a new
@@ -154,7 +154,7 @@ abstract interface class Withdrawable {}
 /// counts for nothing, so a reader checks that [by] wrote [target].
 ///
 /// [T] says what is taken back, so an acceptor waiting on withdrawn approvals
-/// accepts `Withdrawal<Approval>` and is never handed a withdrawn Slack
+/// accepts `Withdrawal<NodeApproval>` and is never handed a withdrawn Slack
 /// reaction. No field holds a [T], so nothing here checks that [target] is
 /// one; the reader that fetches [target] does.
 ///
