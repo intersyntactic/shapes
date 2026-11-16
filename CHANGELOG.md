@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.4
+
+- `EntryId`: any recorded journal entry, so a post can reference events,
+  airlock entries and reply chunks as well as turns. A `TurnId` gives its
+  own as `TurnId.entry`. It's a separate kind rather than a supertype of
+  `TurnId`, so one entry has one `EntryId` however it was reached.
+- `RendererId`: a renderer, named by the `FileSetId` of its package's
+  `lib/*.dart` (https://github.com/enspyrco/intersyntactic/issues/1147).
+
 ## 0.4.3
 
 - `DecidedBy { rules, person }`: who made a decision a record entry holds,

@@ -88,6 +88,36 @@ void main() {
     });
   });
 
+  group('EntryId', () {
+    test('parse reads a sha256 in lower-case hex, and nothing else', () {
+      expect(EntryId.parse(_hex)?.hex, _hex);
+      for (final s in ['', _hex.toUpperCase(), '${_hex}0']) {
+        expect(EntryId.parse(s), isNull, reason: s);
+      }
+      expect(EntryId.of(Uint8List(0)), EntryId.parse(_hex));
+    });
+
+    test('a turn gives the entry that recorded it, one id per entry', () {
+      final turn = TurnId.parse(_hex)!;
+      expect(turn.entry, EntryId.parse(_hex));
+      expect(turn.entry, isNot(turn));
+      expect({turn.entry, EntryId.parse(_hex)}, hasLength(1));
+    });
+  });
+
+  group('RendererId', () {
+    test('is the FileSetId of its lib files, as a kind of its own', () {
+      final files = FileSetId.of({
+        ListedPath.parse('renderer.dart')!: ObjectId.of(Uint8List(0)),
+      })!;
+      final renderer = RendererId.of(files);
+      expect(renderer.hex, files.hex);
+      expect(renderer, isNot(files));
+      expect(RendererId.parse(files.hex), renderer);
+      expect(RendererId.parse('teams-reply'), isNull);
+    });
+  });
+
   group('JourneyPathId', () {
     test('parse reads a sha256 in lower-case hex, and nothing else', () {
       expect(JourneyPathId.parse(_hex)?.hex, _hex);

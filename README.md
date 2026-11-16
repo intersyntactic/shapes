@@ -51,6 +51,13 @@ final takeBack = Withdrawal<Note>(target: sent, by: author);
   never does.
 - `JourneyId`: a journey, named by the hash of the record entry that started
   it, so whoever starts a journey names it.
+- `EntryId`: any recorded journal entry (a turn, an event, an airlock
+  decision, a reply chunk), the same digest as is_journal's `EntryHash`.
+  A `TurnId` gives its own as `turn.entry`; there's no way back, since
+  whether an entry is a turn is the record's to say.
+- `RendererId`: the code that draws a post, named by the `FileSetId` of its
+  package's `lib/*.dart`, the recipe a journal names its own code by
+  ([#1147](https://github.com/enspyrco/intersyntactic/issues/1147)).
 - `DecidedBy`: who made a decision a record holds, `rules` (without asking
   the person) or `person`. Records write these names, so they never change.
 - `JourneyPathId`: a journey path, one thread of turns in a journey, named
