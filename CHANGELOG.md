@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.5
+
+- A `RendererId` is the sha256 of the renderer's published pub.dev archive,
+  as `pubspec.lock` records it and pub.dev reports it as `archive_sha256`,
+  not the `FileSetId` of its `lib/`. pub.dev keeps every version, so the id
+  names code anyone can fetch, and anyone can check it with `shasum`. A
+  renderer imports only the SDK by default, since the archive doesn't
+  cover the packages it imports.
+- `RendererId.of(FileSetId)` is deprecated, and removed in 0.5.0. Read an
+  id with `RendererId.parse`.
+
 ## 0.4.4
 
 - `EntryId`: any recorded journal entry, so a post can reference events,
