@@ -1,5 +1,6 @@
 /// What a shape file uses to mark the fields a node is about, and to name a
-/// node, point at it in any pass, say who wrote it, and take it back.
+/// node, point at it exactly or by what it is about, say who wrote it, and
+/// take it back.
 ///
 /// A shape is a Dart type, and binding is the analyzer checking that an
 /// offering's type can be assigned to an acceptor's
@@ -12,7 +13,7 @@
 /// - [Value]: the other half, what a node currently says, when a shape gathers
 ///   it into one type that can be revised whole.
 /// - [TurnId], [SemanticAnchor], and the [Target] made of the two: a node,
-///   exactly and in any pass.
+///   exactly and by what it is about.
 /// - [EntryId]: any recorded journal entry, which a [TurnId] gives its own.
 /// - [RendererId]: the code that draws a post from recorded entries.
 /// - [ActorId]: who wrote a node.
@@ -25,6 +26,29 @@
 /// The annotation shapes, a comment, a correction and an approval, are built
 /// on these in `is_annotation_shapes`. An annotation is a node an actor writes
 /// beside another node: it points at that node and never changes it.
+///
+/// A node can be named three ways, each answering one question:
+///
+/// - What is it about? Its anchor, a [SemanticAnchor]: its shape and its
+///   identity fields.
+/// - What does it say? Its version: its shape and all its fields.
+/// - Which one, exactly? Its exact id, a [TurnId]: its parent and its bytes,
+///   so it names the node's whole history.
+///
+/// A node is never changed. A new node at an anchor that already has one is
+/// a new exact id, whatever made it: a message edited, a forecast reissued,
+/// a report run again. It is a new version only if it says something
+/// different. Every rule an annotation follows compares two of these: in
+/// `is_annotation_shapes`, an approval holds for a later node at its anchor
+/// with the same version, a correction is held when the node now at its
+/// anchor is another version than the one seen, and who saw what is the
+/// exact id alone.
+///
+/// A version has no type here yet. A reader compares what two nodes say
+/// itself, until a fixed byte layout for a shape's fields lets one hash name
+/// it (https://github.com/intersyntactic/shapes/issues/12). The "identity
+/// version" an anchor is hashed with is something else: a number on the
+/// shape, changed when the shape changes which fields are identity.
 ///
 /// An id is a class with a library-private constructor, made by `of`, which
 /// hashes, or by `parse`, which returns null for a malformed one. So code
@@ -58,8 +82,8 @@ final _actorId = RegExp(r'^[a-z][a-z0-9-]*:[\x21-\x7e]+$');
 /// ```
 ///
 /// A shape with no field marked has every field as identity. So revision is
-/// opt-in: a field is value, which a later pass may change, only when its
-/// shape says so (https://github.com/enspyrco/intersyntactic/issues/1068).
+/// opt-in: a field is value, which a later node at the same anchor may say
+/// differently, only when its shape says so (https://github.com/enspyrco/intersyntactic/issues/1068).
 ///
 /// Nothing runs it. The analyzer reads it from a shape file's source, by its
 /// type, [Identity] (https://github.com/enspyrco/intersyntactic/issues/1069).
@@ -135,7 +159,7 @@ abstract interface class Withdrawable {}
 /// one; the reader that fetches [target] does.
 ///
 /// [target] is the exact node, not an anchor: what is taken back is the one
-/// node its author wrote, not whatever is at its anchor in a later pass.
+/// node its author wrote, not a later node at its anchor.
 final class Withdrawal<T extends Withdrawable> {
   const Withdrawal({required this.target, required this.by});
 
@@ -146,8 +170,8 @@ final class Withdrawal<T extends Withdrawable> {
   final ActorId by;
 }
 
-/// A node, both exactly and in any pass: the node that was seen, and its
-/// anchor.
+/// A node, both exactly and by what it is about: the node that was seen,
+/// and its anchor.
 ///
 /// A reader following it can fetch both: the node at [exact], and the node
 /// now at [anchor]. If they differ in what the reader depends on, two
@@ -160,7 +184,7 @@ final class Target {
   /// The node that was seen.
   final TurnId exact;
 
-  /// The same node, in any pass.
+  /// What it is about, which a later node may share.
   final SemanticAnchor anchor;
 
   @override
@@ -269,9 +293,9 @@ final class RendererId extends Sha256Name {
   };
 }
 
-/// The same node in any pass: hashed from its shape and its identity fields,
-/// never its parent or its value. So a reference made on one pass still finds
-/// its node in the next, where the value has changed and the identity has not.
+/// What a node is about: hashed from its shape and its identity fields,
+/// never its parent or its value. So a reference to one node still finds a
+/// later one at its anchor, which says something new about the same thing.
 final class SemanticAnchor extends Sha256Name {
   SemanticAnchor._(super.digest);
 

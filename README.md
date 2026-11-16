@@ -1,7 +1,8 @@
 # is_shapes
 
 What an intersyntactic shape file uses to mark the fields a node is about, and
-to name a node, point at it in any pass, say who wrote it, and take it back.
+to name a node, point at it exactly or by what it is about, say who wrote it,
+and take it back.
 
 A shape is a Dart type, and binding an offering to an acceptor is the analyzer
 checking that one type can be assigned to the other
@@ -25,10 +26,34 @@ final class Note implements Withdrawable {
 final takeBack = Withdrawal<Note>(target: sent, by: author);
 ```
 
+## Anchor, version, exact id
+
+A node can be named three ways, each answering one question:
+
+| Question | Name | Hashed from |
+|---|---|---|
+| What is it about? | its **anchor**, `SemanticAnchor` | shape + identity fields |
+| What does it say? | its **version** (no type yet, [#12](https://github.com/intersyntactic/shapes/issues/12)) | shape + all fields |
+| Which one, exactly? | its **exact id**, `TurnId` | parent + bytes |
+
+A node is never changed. A new node at an anchor that already has one is a
+new exact id, whatever made it: a message edited, a forecast reissued, a
+report run again. It's a new version only if it says something different.
+Every annotation rule compares two of these. An approval holds for a later
+node at its anchor with the same version, the way a GitHub review comment
+stays put when a push doesn't touch its line. A correction is held when the
+node now at its anchor is another version than the one seen. Who saw what
+is the exact id alone.
+
+The "identity version" an anchor is hashed with (RULINGS) is something
+else: a number on the shape, changed when the shape changes which fields are
+identity.
+
 ## What is here
 
 - `@identity`: marks a field as what the node is about. Every other field is
-  its value, what it currently says, which a later pass may change. A shape with no field marked has
+  its value, what it says, which a later node at the same anchor may say
+  differently. A shape with no field marked has
   every field as identity, so revision is opt-in
   ([#1068](https://github.com/enspyrco/intersyntactic/issues/1068)). The
   analyzer reads it from source by its type, `Identity`, without running
@@ -41,10 +66,10 @@ final takeBack = Withdrawal<Note>(target: sent, by: author);
   type can't be one. Declare values `final`.
 - `TurnId`: one exact node: the sha256 of its parent's id and its own bytes,
   like a git commit.
-- `SemanticAnchor`: the same node in any pass, hashed from its shape and
-  identity fields only.
-- `Target`: the two together, so a reference survives a new pass and a reader
-  can tell when two nodes have come to share an anchor.
+- `SemanticAnchor`: what a node is about, hashed from its shape and identity
+  fields only, so later nodes about the same thing share it.
+- `Target`: the two together, so a reference finds a later node at the same
+  anchor, and a reader can tell when two nodes have come to share one.
 - `ActorId`: who wrote a node, a person or an agent, prefixed by the source
   that minted it: `slack:T0001/U024BE7LH`, or `agent:<id>`, an opaque id the
   agent's install mints on first boot. An agent's name can change; its id
