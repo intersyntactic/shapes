@@ -226,30 +226,43 @@ final class EntryId extends Sha256Name {
   };
 }
 
-/// A renderer: the code that draws a post's words from recorded entries,
-/// named by the [FileSetId] of its package's `lib/*.dart` files, the recipe
-/// a journal names its own code by. So the person checks it with `shasum`
-/// from the package's root, without running it:
+/// A renderer: a package published on pub.dev whose `lib/` draws a post's
+/// words from recorded entries, named by the sha256 of that version's
+/// archive. That is the hash an app's `pubspec.lock` records for it and
+/// pub.dev reports as its `archive_sha256`, so the person checks it without
+/// running anything:
 ///
-///     (cd lib && find . -type f -name '*.dart' -print0 |
-///       LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256)
+///     curl -sL https://pub.dev/api/archives/<name>-<version>.tar.gz |
+///       shasum -a 256
 ///
-/// A renderer imports only import admission's pure list, and names its
-/// pins exactly inside `lib/`, so the code it runs with is the code its id
-/// names, and moving a pin changes it
-/// (https://github.com/enspyrco/intersyntactic/issues/1147).
+/// pub.dev never changes or deletes a version, so the id names code anyone
+/// can fetch for as long as the record is read, and nothing else has to
+/// keep it (https://github.com/enspyrco/intersyntactic/issues/1147).
+///
+/// The archive holds the renderer's own code and its `pubspec.yaml`, not
+/// the packages it imports. So a renderer imports only the SDK part of
+/// import admission's pure list by default. One that imports a package pins
+/// it exactly in its `pubspec.yaml`, which the archive covers, but not what
+/// that package itself depends on, which can still move. So the id alone
+/// does not pin the code a renderer runs with, its dependencies or the Dart
+/// SDK: the executable's own hash, recorded beside it, names what actually
+/// ran.
 ///
 /// It cannot hold its own id, since no file can hold its own hash: whatever
-/// loads it measures it. A different kind of name from a [FileSetId], so a
-/// journal's code hash is never taken for a renderer.
+/// builds it reads the id from `pubspec.lock`.
 final class RendererId extends Sha256Name {
   RendererId._(super.digest);
 
   /// The renderer whose `lib/*.dart` files are [files].
+  @Deprecated(
+    'A RendererId is the sha256 of the renderer\'s published archive, '
+    'not of its lib/ files; read it with RendererId.parse. Removed in 0.5.0.',
+  )
   RendererId.of(FileSetId files) : this._(files.bytes);
 
-  /// [s] as a renderer id, read back from text; null unless it is a sha256
-  /// in lower-case hex.
+  /// [s] as a renderer id, read back from text, such as a `pubspec.lock`'s
+  /// `sha256` for the renderer or pub.dev's `archive_sha256`; null unless it
+  /// is a sha256 in lower-case hex.
   static RendererId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
     final d? => RendererId._(d),
     null => null,
