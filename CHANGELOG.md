@@ -10,6 +10,12 @@
   cover the packages it imports.
 - `RendererId.of(FileSetId)` is deprecated, and removed in 0.5.0. Read an
   id with `RendererId.parse`.
+- Docs: a node can be named three ways, by its anchor (what it is about),
+  its version (what it says) and its exact id (which one, exactly). "Pass",
+  which the docs used for a later node at the same anchor and never
+  defined, is gone: an edit, a reissue and a re-run all make one the same
+  way. The version has no type yet
+  (https://github.com/intersyntactic/shapes/issues/12).
 
 ## 0.4.4
 
