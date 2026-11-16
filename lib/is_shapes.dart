@@ -13,6 +13,8 @@
 ///   it into one type that can be revised whole.
 /// - [TurnId], [SemanticAnchor], and the [Target] made of the two: a node,
 ///   exactly and in any pass.
+/// - [EntryId]: any recorded journal entry, which a [TurnId] gives its own.
+/// - [RendererId]: the code that draws a post from recorded entries.
 /// - [ActorId]: who wrote a node.
 /// - [DecidedBy]: whether a decision was the rules' or the person's.
 /// - [JourneyId] and [JourneyPathId]: the journey a node is in, and the
@@ -173,10 +175,18 @@ final class Target {
 /// git commit, so it names the node's whole history. Two nodes with the same
 /// fields in different places have different ids.
 ///
+/// A turn recorded in a journal is named by the hash of the entry that
+/// recorded it, which names the entry before it and the turn's bytes, so
+/// [entry] is the same name as an [EntryId].
+///
 /// It is a different kind of name from a [SemanticAnchor] or an `ObjectId`,
 /// so the same bytes as one of those are never equal to it.
 final class TurnId extends Sha256Name {
   TurnId._(super.digest);
+
+  /// The journal entry that recorded this turn, as an id any entry has: what
+  /// a reference to recorded entries of every kind holds.
+  EntryId get entry => EntryId._(bytes);
 
   /// The id of the node whose bytes, as the journey path stores them, are
   /// [node]. Which bytes those are is the journey path's to say: it is what
@@ -187,6 +197,61 @@ final class TurnId extends Sha256Name {
   /// lower-case hex.
   static TurnId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
     final d? => TurnId._(d),
+    null => null,
+  };
+}
+
+/// A recorded journal entry, of any kind: a turn, an event, an airlock
+/// decision, a chunk of a reply. It is the sha256 of the entry, the same
+/// digest as `is_journal`'s `EntryHash`, so a reader asks the journal for
+/// the entry by it and checks that what comes back hashes to it.
+///
+/// A [TurnId] is one of these that is known to be a turn, and gives its own
+/// by [TurnId.entry]. There is no way back: whether an entry is a turn is
+/// for the record to say. So an entry has one [EntryId] however it was
+/// reached, and a set of them holds each entry once, where an `EntryId` that
+/// a [TurnId] extended would be unequal to that same [TurnId].
+final class EntryId extends Sha256Name {
+  EntryId._(super.digest);
+
+  /// The id of the entry whose bytes, as the journal stores them, are
+  /// [entry].
+  factory EntryId.of(Uint8List entry) => EntryId._(sha256(entry));
+
+  /// [s] as an entry id, read back from text; null unless it is a sha256 in
+  /// lower-case hex.
+  static EntryId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
+    final d? => EntryId._(d),
+    null => null,
+  };
+}
+
+/// A renderer: the code that draws a post's words from recorded entries,
+/// named by the [FileSetId] of its package's `lib/*.dart` files, the recipe
+/// a journal names its own code by. So the person checks it with `shasum`
+/// from the package's root, without running it:
+///
+///     (cd lib && find . -type f -name '*.dart' -print0 |
+///       LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256)
+///
+/// A renderer imports only import admission's pure list, and names its
+/// pins exactly inside `lib/`, so the code it runs with is the code its id
+/// names, and moving a pin changes it
+/// (https://github.com/enspyrco/intersyntactic/issues/1147).
+///
+/// It cannot hold its own id, since no file can hold its own hash: whatever
+/// loads it measures it. A different kind of name from a [FileSetId], so a
+/// journal's code hash is never taken for a renderer.
+final class RendererId extends Sha256Name {
+  RendererId._(super.digest);
+
+  /// The renderer whose `lib/*.dart` files are [files].
+  RendererId.of(FileSetId files) : this._(files.bytes);
+
+  /// [s] as a renderer id, read back from text; null unless it is a sha256
+  /// in lower-case hex.
+  static RendererId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
+    final d? => RendererId._(d),
     null => null,
   };
 }
