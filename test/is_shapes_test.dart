@@ -105,18 +105,6 @@ void main() {
     });
   });
 
-  group('RendererId', () {
-    test('reads an archive sha256, as a kind of its own', () {
-      // is_shapes 0.4.4's archive_sha256 on pub.dev, as pubspec.lock has it.
-      const archive =
-          '6177616c5b7c14354e9410551a1acb2d31177ffb014e1289b6ae48571f0dd82b';
-      expect(RendererId.parse(archive)?.hex, archive);
-      expect(RendererId.parse(archive), isNot(ObjectId.parse(archive)));
-      expect(RendererId.parse('teams-reply'), isNull);
-      expect(RendererId.parse('is_teams_reply-0.1.0'), isNull);
-    });
-  });
-
   group('TrajectoryId', () {
     test('parse reads a sha256 in lower-case hex, and nothing else', () {
       expect(TrajectoryId.parse(_hex)?.hex, _hex);

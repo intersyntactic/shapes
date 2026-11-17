@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.1
+
+- `RendererId` is deprecated. Renderers are cut (Nick, 18 Nov): a send
+  carries its exact bytes, a projection of recorded turns, and the airlock
+  approves those bytes and checks that they come from a recorded turn, so
+  no code is named. It is deprecated rather than removed, so no package has
+  to move to a new minor version for it. It goes in the next release that
+  has to break anyway.
+- Docs name is_lint_rules' checks and is_annotation_shapes 0.3.0's types
+  (https://github.com/intersyntactic/shapes/pull/21,
+  https://github.com/intersyntactic/shapes/pull/22).
+
 ## 0.5.0
 
 - **Breaking:** `JourneyId` is `MissionId`, and `JourneyPathId` is

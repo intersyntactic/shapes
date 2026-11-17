@@ -15,7 +15,6 @@
 /// - [TurnId], [SemanticAnchor], and the [Target] made of the two: a node,
 ///   exactly and by what it is about.
 /// - [EntryId]: any recorded journal entry, which a [TurnId] gives its own.
-/// - [RendererId]: the code that draws a post from recorded entries.
 /// - [ActorId]: who wrote a node.
 /// - [DecidedBy]: whether a decision was the rules' or the person's.
 /// - [MissionId] and [TrajectoryId]: the mission a node is in, and the
@@ -250,36 +249,25 @@ final class EntryId extends Sha256Name {
   };
 }
 
-/// A renderer: a package published on pub.dev whose `lib/` draws a post's
-/// words from recorded entries, named by the sha256 of that version's
-/// archive. That is the hash an app's `pubspec.lock` records for it and
-/// pub.dev reports as its `archive_sha256`, so the person checks it without
-/// running anything:
+/// The sha256 of a renderer package's published archive, from the post
+/// design of https://github.com/enspyrco/intersyntactic/issues/1147, in
+/// which a separate program drew a post's bytes from recorded entries.
 ///
-///     curl -sL https://pub.dev/api/archives/<name>-<version>.tar.gz |
-///       shasum -a 256
-///
-/// pub.dev never changes or deletes a version, so the id names code anyone
-/// can fetch for as long as the record is read, and nothing else has to
-/// keep it (https://github.com/enspyrco/intersyntactic/issues/1147).
-///
-/// The archive holds the renderer's own code and its `pubspec.yaml`, not
-/// the packages it imports. So a renderer imports only the SDK part of
-/// import admission's pure list by default. One that imports a package pins
-/// it exactly in its `pubspec.yaml`, which the archive covers, but not what
-/// that package itself depends on, which can still move. So the id alone
-/// does not pin the code a renderer runs with, its dependencies or the Dart
-/// SDK: the executable's own hash, recorded beside it, names what actually
-/// ran.
-///
-/// It cannot hold its own id, since no file can hold its own hash: whatever
-/// builds it reads the id from `pubspec.lock`.
+/// Renderers are cut (Nick, 18 Nov). A send carries its exact bytes, a
+/// projection of recorded turns, and the airlock approves those bytes and
+/// checks that they come from a recorded turn. No code needs to be named
+/// for that, so nothing names one. Deprecated rather than removed so no
+/// package has to move to a new minor version for it; it goes in the next
+/// release that has to break anyway.
+@Deprecated(
+  'Renderers are cut: a send carries its exact bytes, which the airlock '
+  'approves (Nick, 18 Nov). Removed in the next breaking release.',
+)
 final class RendererId extends Sha256Name {
   RendererId._(super.digest);
 
-  /// [s] as a renderer id, read back from text, such as a `pubspec.lock`'s
-  /// `sha256` for the renderer or pub.dev's `archive_sha256`; null unless it
-  /// is a sha256 in lower-case hex.
+  /// [s] as a renderer id, read back from text; null unless it is a sha256
+  /// in lower-case hex.
   static RendererId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
     final d? => RendererId._(d),
     null => null,
