@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0
+
+- **Breaking:** `RendererId` is gone. Renderers are cut (Nick, 18 Nov): a
+  send carries its exact bytes, a projection of recorded turns, and the
+  airlock approves those bytes and checks that they come from a recorded
+  turn, so no code is named.
+- Docs name is_lint_rules' checks and is_annotation_shapes 0.3.0's types
+  (https://github.com/intersyntactic/shapes/pull/21,
+  https://github.com/intersyntactic/shapes/pull/22).
+
 ## 0.5.0
 
 - **Breaking:** `JourneyId` is `MissionId`, and `JourneyPathId` is

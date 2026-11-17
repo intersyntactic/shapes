@@ -81,12 +81,6 @@ identity.
   decision, a reply chunk), the same digest as is_journal's `EntryHash`.
   A `TurnId` gives its own as `turn.entry`; there's no way back, since
   whether an entry is a turn is the record's to say.
-- `RendererId`: the code that draws a post, a package published on pub.dev,
-  named by the sha256 of that version's archive: the hash `pubspec.lock`
-  records and pub.dev reports as `archive_sha256`, which anyone can check
-  with `curl … | shasum -a 256`. A renderer imports only the SDK by default,
-  since the archive doesn't cover the packages it imports
-  ([#1147](https://github.com/enspyrco/intersyntactic/issues/1147)).
 - `DecidedBy`: who made a decision a record holds, `rules` (without asking
   the person) or `person`. Records write these names, so they never change.
 - `TrajectoryId`: a trajectory, one line of turns in a mission, the
