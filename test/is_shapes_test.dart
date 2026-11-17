@@ -66,25 +66,25 @@ void main() {
     });
   });
 
-  group('JourneyId', () {
+  group('MissionId', () {
     test('parse reads a sha256 in lower-case hex, and nothing else', () {
-      expect(JourneyId.parse(_hex)?.hex, _hex);
+      expect(MissionId.parse(_hex)?.hex, _hex);
       for (final s in ['', _hex.toUpperCase(), '${_hex}0', 'a1b2c3d4e5']) {
-        expect(JourneyId.parse(s), isNull, reason: s);
+        expect(MissionId.parse(s), isNull, reason: s);
       }
     });
 
     test('of hashes the entry that started it', () {
-      expect(JourneyId.of(Uint8List(0)), JourneyId.parse(_hex));
+      expect(MissionId.of(Uint8List(0)), MissionId.parse(_hex));
       expect(
-        JourneyId.of(Uint8List(0)).hashCode,
-        JourneyId.parse(_hex).hashCode,
+        MissionId.of(Uint8List(0)).hashCode,
+        MissionId.parse(_hex).hashCode,
       );
     });
 
     test('never equal to another kind of name with the same bytes', () {
-      expect(JourneyId.parse(_hex), isNot(TurnId.parse(_hex)));
-      expect(JourneyId.of(Uint8List(0)), isNot(ObjectId.of(Uint8List(0))));
+      expect(MissionId.parse(_hex), isNot(TurnId.parse(_hex)));
+      expect(MissionId.of(Uint8List(0)), isNot(ObjectId.of(Uint8List(0))));
     });
   });
 
@@ -117,21 +117,21 @@ void main() {
     });
   });
 
-  group('JourneyPathId', () {
+  group('TrajectoryId', () {
     test('parse reads a sha256 in lower-case hex, and nothing else', () {
-      expect(JourneyPathId.parse(_hex)?.hex, _hex);
-      // The airlock's old JourneyPathId took any non-blank string.
+      expect(TrajectoryId.parse(_hex)?.hex, _hex);
+      // The airlock's old TrajectoryId took any non-blank string.
       for (final s in ['', ' ', 'root', 'child', _hex.toUpperCase()]) {
-        expect(JourneyPathId.parse(s), isNull, reason: s);
+        expect(TrajectoryId.parse(s), isNull, reason: s);
       }
     });
 
     test('of hashes the entry that started it', () {
-      expect(JourneyPathId.of(Uint8List(0)), JourneyPathId.parse(_hex));
+      expect(TrajectoryId.of(Uint8List(0)), TrajectoryId.parse(_hex));
     });
 
-    test('never equal to the journey the same entry started', () {
-      expect(JourneyPathId.of(Uint8List(0)), isNot(JourneyId.of(Uint8List(0))));
+    test('never equal to the mission the same entry started', () {
+      expect(TrajectoryId.of(Uint8List(0)), isNot(MissionId.of(Uint8List(0))));
     });
   });
 

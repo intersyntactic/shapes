@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.0
+
+- **Breaking:** `JourneyId` is `MissionId`, and `JourneyPathId` is
+  `TrajectoryId` (Nick, 17 Nov). A mission is one span of work under one
+  set of rules, admitted from outside or started in the app, which ends. A
+  trajectory is one line of turns in a mission, the person's and the
+  agent's alike: it names the line, not who is on it. Nothing else about
+  either id changes: each is still the sha256 of the record entry that
+  started it, so ids already computed keep their hex.
+- **Breaking:** `RendererId.of(FileSetId)`, deprecated in 0.4.5, is gone.
+  Read a renderer's id with `RendererId.parse`.
+
 ## 0.4.5
 
 - A `RendererId` is the sha256 of the renderer's published pub.dev archive,

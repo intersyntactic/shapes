@@ -74,8 +74,9 @@ identity.
   that minted it: `slack:T0001/U024BE7LH`, or `agent:<id>`, an opaque id the
   agent's install mints on first boot. An agent's name can change; its id
   never does.
-- `JourneyId`: a journey, named by the hash of the record entry that started
-  it, so whoever starts a journey names it.
+- `MissionId`: a mission, one span of work under one set of rules, admitted
+  from outside or started in the app, which ends. Named by the hash of the
+  record entry that started it, so whoever starts a mission names it.
 - `EntryId`: any recorded journal entry (a turn, an event, an airlock
   decision, a reply chunk), the same digest as is_journal's `EntryHash`.
   A `TurnId` gives its own as `turn.entry`; there's no way back, since
@@ -88,10 +89,11 @@ identity.
   ([#1147](https://github.com/enspyrco/intersyntactic/issues/1147)).
 - `DecidedBy`: who made a decision a record holds, `rules` (without asking
   the person) or `person`. Records write these names, so they never change.
-- `JourneyPathId`: a journey path, one thread of turns in a journey, named
-  the same way by the entry that started it. A journey path is only ever
-  started: one that came from another names its parent in its own first
-  entry.
+- `TrajectoryId`: a trajectory, one line of turns in a mission, the
+  person's and the agent's alike, named the same way by the entry that
+  started it. It names the line, not who is on it. A trajectory is only ever
+  started: one launched from a point on another names its parent in its own
+  first entry.
 - `Withdrawable`: a shape whose nodes can be taken back says so by
   implementing it. A withdrawal is final: changing your mind back is a new
   node, with a new id, which no earlier withdrawal targets.
@@ -126,8 +128,8 @@ node and never changes it, as in the
   person, in two modules or in two Slack workspaces. That will be a table
   beside the ids, which changes no id already written.
 - **How a node becomes bytes.** `TurnId.of` and `SemanticAnchor.of` hash the
-  bytes they are given. Which bytes those are (a node as the journey path
-  stores it; a shape and its identity fields, encoded) is the journey path's
+  bytes they are given. Which bytes those are (a node as the trajectory
+  stores it; a shape and its identity fields, encoded) is the trajectory's
   and the shape language's to say, so there is no `toJson` here yet.
 
 ## The pure list
