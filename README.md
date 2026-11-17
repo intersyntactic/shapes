@@ -81,9 +81,6 @@ identity.
   decision, a reply chunk), the same digest as is_journal's `EntryHash`.
   A `TurnId` gives its own as `turn.entry`; there's no way back, since
   whether an entry is a turn is the record's to say.
-- `RendererId`: deprecated. Renderers are cut (Nick, 18 Nov): a send carries
-  its exact bytes, a projection of recorded turns, and the airlock approves
-  those bytes. It goes in the next release that has to break anyway.
 - `DecidedBy`: who made a decision a record holds, `rules` (without asking
   the person) or `person`. Records write these names, so they never change.
 - `TrajectoryId`: a trajectory, one line of turns in a mission, the

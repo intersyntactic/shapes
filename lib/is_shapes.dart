@@ -249,31 +249,6 @@ final class EntryId extends Sha256Name {
   };
 }
 
-/// The sha256 of a renderer package's published archive, from the post
-/// design of https://github.com/enspyrco/intersyntactic/issues/1147, in
-/// which a separate program drew a post's bytes from recorded entries.
-///
-/// Renderers are cut (Nick, 18 Nov). A send carries its exact bytes, a
-/// projection of recorded turns, and the airlock approves those bytes and
-/// checks that they come from a recorded turn. No code needs to be named
-/// for that, so nothing names one. Deprecated rather than removed so no
-/// package has to move to a new minor version for it; it goes in the next
-/// release that has to break anyway.
-@Deprecated(
-  'Renderers are cut: a send carries its exact bytes, which the airlock '
-  'approves (Nick, 18 Nov). Removed in the next breaking release.',
-)
-final class RendererId extends Sha256Name {
-  RendererId._(super.digest);
-
-  /// [s] as a renderer id, read back from text; null unless it is a sha256
-  /// in lower-case hex.
-  static RendererId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
-    final d? => RendererId._(d),
-    null => null,
-  };
-}
-
 /// What a node is about: hashed from its shape and its identity fields,
 /// never its parent or its value. So a reference to one node still finds a
 /// later one at its anchor, which says something new about the same thing.
