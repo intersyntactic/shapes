@@ -18,8 +18,8 @@
 /// - [RendererId]: the code that draws a post from recorded entries.
 /// - [ActorId]: who wrote a node.
 /// - [DecidedBy]: whether a decision was the rules' or the person's.
-/// - [JourneyId] and [JourneyPathId]: the journey a node is in, and the
-///   journey path, its thread of turns, within it.
+/// - [MissionId] and [TrajectoryId]: the mission a node is in, and the
+///   trajectory, its line of turns, within it.
 /// - [Withdrawal]: takes back a node its author wrote, of a shape that is
 ///   [Withdrawable].
 ///
@@ -212,8 +212,8 @@ final class TurnId extends Sha256Name {
   /// a reference to recorded entries of every kind holds.
   EntryId get entry => EntryId._(bytes);
 
-  /// The id of the node whose bytes, as the journey path stores them, are
-  /// [node]. Which bytes those are is the journey path's to say: it is what
+  /// The id of the node whose bytes, as the trajectory stores them, are
+  /// [node]. Which bytes those are is the trajectory's to say: it is what
   /// mints a node's id.
   factory TurnId.of(Uint8List node) => TurnId._(sha256(node));
 
@@ -277,13 +277,6 @@ final class EntryId extends Sha256Name {
 final class RendererId extends Sha256Name {
   RendererId._(super.digest);
 
-  /// The renderer whose `lib/*.dart` files are [files].
-  @Deprecated(
-    'A RendererId is the sha256 of the renderer\'s published archive, '
-    'not of its lib/ files; read it with RendererId.parse. Removed in 0.5.0.',
-  )
-  RendererId.of(FileSetId files) : this._(files.bytes);
-
   /// [s] as a renderer id, read back from text, such as a `pubspec.lock`'s
   /// `sha256` for the renderer or pub.dev's `archive_sha256`; null unless it
   /// is a sha256 in lower-case hex.
@@ -313,52 +306,55 @@ final class SemanticAnchor extends Sha256Name {
   };
 }
 
-/// A journey: the hash of the record entry that started it. Whoever starts a
-/// journey names it, by writing that entry, so a journey has one name and
+/// A mission: one span of work under one set of rules, admitted from outside
+/// or started in the app, which ends. A Teams channel is a mission, started
+/// by its first thread.
+///
+/// Named by the hash of the record entry that started it. Whoever starts a
+/// mission names it, by writing that entry, so a mission has one name and
 /// nothing has to be asked to hand one out. It is the same hash as the
 /// entry's own, as a different kind of name, so it is never equal to the
-/// entry's hash, or to the [JourneyPathId] of a journey path the same entry
+/// entry's hash, or to the [TrajectoryId] of a trajectory the same entry
 /// started.
-///
-/// A journey's journey paths are its threads of turns; a Teams channel is a
-/// journey, started by its first thread, and each thread is a journey path
-/// (RULINGS, "The docking port admits arrivals under journey paths").
-final class JourneyId extends Sha256Name {
-  JourneyId._(super.digest);
+final class MissionId extends Sha256Name {
+  MissionId._(super.digest);
 
-  /// The id of the journey started by the entry whose bytes, as the record
+  /// The id of the mission started by the entry whose bytes, as the record
   /// stores them, are [entry].
-  factory JourneyId.of(Uint8List entry) => JourneyId._(sha256(entry));
+  factory MissionId.of(Uint8List entry) => MissionId._(sha256(entry));
 
-  /// [s] as a journey id, read back from text; null unless it is a sha256 in
+  /// [s] as a mission id, read back from text; null unless it is a sha256 in
   /// lower-case hex.
-  static JourneyId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
-    final d? => JourneyId._(d),
+  static MissionId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
+    final d? => MissionId._(d),
     null => null,
   };
 }
 
-/// A journey path: one thread of turns in a journey, named, like its
-/// [JourneyId], by the hash of the record entry that started it. Its entries
-/// carry it, so they can be told from every other journey path's, after a
-/// restart too.
+/// A trajectory: one line of turns in a mission, the person's and the
+/// agent's alike, such as one thread of a Teams channel. It names the line,
+/// not who is on it: who wrote a turn is its [ActorId].
 ///
-/// A journey path is only ever started, never handed out by another: an
-/// entry can't hold its own hash, so a journey path named by an entry its
-/// parent writes would need its name before that entry exists. One that
-/// comes from another would say so in its own first entry, naming its
-/// parent, the way a git commit names its parent and never its children.
-final class JourneyPathId extends Sha256Name {
-  JourneyPathId._(super.digest);
+/// Named, like its [MissionId], by the hash of the record entry that started
+/// it. Its entries carry it, so they can be told from every other
+/// trajectory's, after a restart too.
+///
+/// A trajectory is only ever started: an entry can't hold its own hash, so a
+/// trajectory named in an entry its parent writes would need its name before
+/// that entry exists. One launched from a point on another says so in its
+/// own first entry, naming its parent, the way a git commit names its parent
+/// and never its children.
+final class TrajectoryId extends Sha256Name {
+  TrajectoryId._(super.digest);
 
-  /// The id of the journey path started by the entry whose bytes, as the
+  /// The id of the trajectory started by the entry whose bytes, as the
   /// record stores them, are [entry].
-  factory JourneyPathId.of(Uint8List entry) => JourneyPathId._(sha256(entry));
+  factory TrajectoryId.of(Uint8List entry) => TrajectoryId._(sha256(entry));
 
-  /// [s] as a journey path id, read back from text; null unless it is a
-  /// sha256 in lower-case hex.
-  static JourneyPathId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
-    final d? => JourneyPathId._(d),
+  /// [s] as a trajectory id, read back from text; null unless it is a sha256
+  /// in lower-case hex.
+  static TrajectoryId? parse(String s) => switch (Sha256Name.digestOfHex(s)) {
+    final d? => TrajectoryId._(d),
     null => null,
   };
 }
@@ -407,11 +403,11 @@ final class ActorId {
 /// rename one and every entry already written says something else.
 enum DecidedBy {
   /// Decided without asking the person, by the rules it falls under: a
-  /// journey path's rules for a run, a journey's and its turns' for an
+  /// trajectory's rules for a run, a mission's and its turns' for an
   /// arrival.
   rules,
 
   /// The person decided, when asked or on their own, as by stopping a
-  /// journey path.
+  /// trajectory.
   person,
 }
