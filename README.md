@@ -60,7 +60,7 @@ identity.
   anything.
 - `Value`: the other half of a shape. A shape that can be corrected gathers
   its value into one class extending `Value`, under whatever name fits it
-  (Hart's `RungVerdict extends Value`), and `Correction<V extends Value>` in
+  (Hart's `RungVerdict extends Value`), and `NodeCorrection<V extends Value>` in
   `is_annotation_shapes` proposes a new one. It is `abstract base`: another
   library can extend it but not implement it, and a record or an extension
   type can't be one. Declare values `final`.
